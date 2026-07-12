@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ComprobantePlanilla"
+              pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
+    <parameter name="EMPLEADO_ID" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+    </parameter>
+    <queryString>
+        <![CDATA[SELECT
+            p.id AS planilla_id,
+            e.id AS empleado_id,
+            CONCAT(e.nombre, ' ', e.apellido) AS empleado_nombre,
+            e.cargo,
+            p.salario_base,
+            p.horas_extras,
+            p.viaticos,
+            p.total_neto,
+            p.fecha_pago
+        FROM planilla p
+        INNER JOIN empleado e ON p.empleado_id = e.id
+        WHERE e.id = $P{EMPLEADO_ID}
+        ORDER BY p.fecha_pago DESC, p.id DESC
+        LIMIT 1]]>
+    </queryString>
+    <field name="planilla_id" class="java.lang.Integer"/>
+    <field name="empleado_id" class="java.lang.Integer"/>
+    <field name="empleado_nombre" class="java.lang.String"/>
+    <field name="cargo" class="java.lang.String"/>
+    <field name="salario_base" class="java.math.BigDecimal"/>
+    <field name="horas_extras" class="java.math.BigDecimal"/>
+    <field name="viaticos" class="java.math.BigDecimal"/>
+    <field name="total_neto" class="java.math.BigDecimal"/>
+    <field name="fecha_pago" class="java.sql.Date"/>
+    <title>
+        <band height="90" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="30" forecolor="#0B3D5C" uuid="e68cb678-b05f-4a37-8cc7-4972272adb48"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[GlassCore - Vidrieria Industrial]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="35" width="555" height="24" uuid="9b0963cf-3e9b-45a0-813a-051e9dfba229"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[COMPROBANTE DE PAGO DE PLANILLA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="65" width="555" height="18" uuid="251ba0fa-1bdc-4b55-ac0a-755ebdc5f3e9"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <text><![CDATA[Documento parametrizado por ID de empleado]]></text>
+            </staticText>
+        </band>
+    </title>
+    <detail>
+        <band height="220" splitType="Stretch">
+            <staticText>
+                <reportElement x="20" y="10" width="140" height="20" uuid="fdcf4578-decc-4e10-a878-d7690589c2fc"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[No. Planilla:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="160" y="10" width="200" height="20" uuid="32293940-0c59-4305-96e7-01068304fb85"/>
+                <textFieldExpression><![CDATA[$F{planilla_id}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="35" width="140" height="20" uuid="5d902304-70bf-4e0b-acdc-886e9e443cec"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Empleado:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="160" y="35" width="350" height="20" uuid="34193718-08b0-4b9e-9379-62523786316e"/>
+                <textFieldExpression><![CDATA[$F{empleado_nombre}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="60" width="140" height="20" uuid="7ca64e28-af2c-466c-a795-03e0378cb4d8"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Cargo:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="160" y="60" width="200" height="20" uuid="4944d628-7867-46fa-980a-4eaf60a7af6f"/>
+                <textFieldExpression><![CDATA[$F{cargo}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="85" width="140" height="20" uuid="837cf137-176d-4dcb-b1c1-da98ed4c5e14"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Fecha de pago:]]></text>
+            </staticText>
+            <textField pattern="dd/MM/yyyy">
+                <reportElement x="160" y="85" width="200" height="20" uuid="4073bd38-c058-46c1-8295-9d274a4a9026"/>
+                <textFieldExpression><![CDATA[$F{fecha_pago}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="120" width="200" height="20" uuid="2559955b-4f2f-497d-93e2-70bb5ffab05f"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Salario base (Lps):]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="240" y="120" width="150" height="20" uuid="ca413d2a-61fb-4b32-a9ea-ce68828e56ef"/>
+                <textFieldExpression><![CDATA[$F{salario_base}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="145" width="200" height="20" uuid="0c9f0914-9883-44fc-8361-4782c1b316ca"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Horas extras (Lps):]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="240" y="145" width="150" height="20" uuid="a8f0adf7-05f1-4e10-a385-f30202a0e02e"/>
+                <textFieldExpression><![CDATA[$F{horas_extras}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="170" width="200" height="20" uuid="c35cc1af-fd7d-4316-be24-b97704b4c309"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Viaticos (Lps):]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="240" y="170" width="150" height="20" uuid="5b0caa4b-d358-4324-9a34-ce3ad04bf219"/>
+                <textFieldExpression><![CDATA[$F{viaticos}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="195" width="200" height="20" uuid="c1b3c336-06dc-4a49-b428-b34ebbd0642f"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <text><![CDATA[TOTAL NETO (Lps):]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="240" y="195" width="150" height="20" uuid="102fc6e3-76d2-4a3a-a7ca-506ebe48256b"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{total_neto}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="30">
+            <staticText>
+                <reportElement x="0" y="5" width="555" height="20" uuid="3b055ba6-15bf-472b-a5c9-0b59d481c2ba"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[GlassCore - Comprobante de planilla]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+</jasperReport>

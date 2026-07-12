@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="HojaRutaDespacho"
+              pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="b2c3d4e5-f6a7-8901-bcde-f12345678901">
+    <parameter name="VIAJE_ID" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+    </parameter>
+    <queryString>
+        <![CDATA[SELECT
+            vi.id AS viaje_id,
+            ve.placa,
+            ve.marca,
+            CONCAT(e.nombre, ' ', e.apellido) AS chofer_nombre,
+            e.telefono AS chofer_telefono,
+            vi.ruta,
+            vi.es_redondo,
+            vi.kilometros,
+            vi.litros_estimados,
+            vi.gasto_combustible,
+            vi.fecha_salida,
+            COALESCE((
+                SELECT GROUP_CONCAT(CONCAT(h.codigo, ' - ', h.nombre) SEPARATOR ', ')
+                FROM herramienta h
+                WHERE h.empleado_id = vi.chofer_id AND h.estado = 'ASIGNADA'
+            ), 'Sin herramientas asignadas') AS herramientas_custodia
+        FROM viaje vi
+        INNER JOIN vehiculo ve ON vi.vehiculo_id = ve.id
+        INNER JOIN empleado e ON vi.chofer_id = e.id
+        WHERE vi.id = $P{VIAJE_ID}]]>
+    </queryString>
+    <field name="viaje_id" class="java.lang.Integer"/>
+    <field name="placa" class="java.lang.String"/>
+    <field name="marca" class="java.lang.String"/>
+    <field name="chofer_nombre" class="java.lang.String"/>
+    <field name="chofer_telefono" class="java.lang.String"/>
+    <field name="ruta" class="java.lang.String"/>
+    <field name="es_redondo" class="java.lang.Boolean"/>
+    <field name="kilometros" class="java.lang.Integer"/>
+    <field name="litros_estimados" class="java.math.BigDecimal"/>
+    <field name="gasto_combustible" class="java.math.BigDecimal"/>
+    <field name="fecha_salida" class="java.sql.Timestamp"/>
+    <field name="herramientas_custodia" class="java.lang.String"/>
+    <title>
+        <band height="80" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="28" forecolor="#0B3D5C" uuid="1397db85-7bd5-45fb-809f-2ed9577c76e6"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[GlassCore - Despacho Logistico]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="35" width="555" height="24" uuid="06546e4a-a6bd-48ad-8785-cd84ba2bf124"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[HOJA DE RUTA Y ORDEN DE SALIDA]]></text>
+            </staticText>
+        </band>
+    </title>
+    <detail>
+        <band height="280" splitType="Stretch">
+            <staticText>
+                <reportElement x="20" y="10" width="160" height="20" uuid="05fac7d8-2d8d-408b-bfa1-8f898a5f7016"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[No. Viaje:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="10" width="200" height="20" uuid="9202ef2c-5dd0-40ca-9f2d-913bdd9b6170"/>
+                <textFieldExpression><![CDATA[$F{viaje_id}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="35" width="160" height="20" uuid="8b1e18ad-8cd3-4349-9e9e-bc473ee6c66d"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Placa del vehiculo:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="35" width="200" height="20" uuid="fa72c0e4-5d36-4197-bda6-6c926f5f0ba4"/>
+                <textFieldExpression><![CDATA[$F{placa}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="60" width="160" height="20" uuid="0d0fdcdc-a53f-4d51-a482-3d6cff9633bb"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Marca:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="60" width="200" height="20" uuid="99666653-f6da-41eb-9813-412a0bf83e65"/>
+                <textFieldExpression><![CDATA[$F{marca}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="85" width="160" height="20" uuid="15829f3d-0d62-43b9-b86a-b10688352a8e"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Chofer asignado:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="85" width="350" height="20" uuid="5411b2ac-d534-4167-b73d-004d023bfd7f"/>
+                <textFieldExpression><![CDATA[$F{chofer_nombre}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="110" width="160" height="20" uuid="0f5a596c-7a39-4e0e-9796-0960239404a1"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Telefono:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="110" width="200" height="20" uuid="3602f83f-7cbc-44bb-ab2a-1a186eee80e7"/>
+                <textFieldExpression><![CDATA[$F{chofer_telefono}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="135" width="160" height="20" uuid="516ea2c5-6537-44b5-a8d4-bb5780e14fce"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Ruta:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="135" width="350" height="20" uuid="15195217-4799-4f5b-af24-df0e4ff5a05a"/>
+                <textFieldExpression><![CDATA[$F{ruta}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="160" width="160" height="20" uuid="3471fe59-b07f-4cfd-bde1-3fbc169e217e"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Kilometros:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="160" width="200" height="20" uuid="cd10c743-2bfd-4641-bf97-cd5db54ebf7e"/>
+                <textFieldExpression><![CDATA[$F{kilometros}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="185" width="160" height="20" uuid="624e6f1d-f03f-4411-a077-67ac0c090bbe"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Gasto combustible (Lps):]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="180" y="185" width="200" height="20" uuid="c2350342-aac3-4e77-ba26-d54d7543135d"/>
+                <textElement><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{gasto_combustible}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="210" width="160" height="20" uuid="53a9b55a-e3d7-492e-a1be-42f892b20697"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Herramientas en custodia:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="20" y="230" width="515" height="40" uuid="f78ef9d6-946c-40a3-8e06-a7092de652b6"/>
+                <textFieldExpression><![CDATA[$F{herramientas_custodia}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="30">
+            <staticText>
+                <reportElement x="0" y="5" width="555" height="20" uuid="6a285e07-092f-4034-a57f-4ee98514b709"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[GlassCore - Hoja de ruta y despacho]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+</jasperReport>

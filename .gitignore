@@ -1,0 +1,12 @@
+# NetBeans / Git
+/target/
+/nbproject/private/
+/build/
+*.class
+*.log
+.DS_Store
+.idea/
+*.iml
+dependency-reduced-pom.xml
+cp.txt
+GlassCore_Reportes/

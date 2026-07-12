@@ -1,13 +1,10 @@
--- ============================================================
--- GlassCore Logistics - Script MySQL Workbench
--- Ejecutar completo en MySQL Workbench (File > Run SQL Script)
--- ============================================================
+-- GlassCore Logistics
+-- Script de base de datos para MySQL Workbench
 
 DROP DATABASE IF EXISTS glasscore_db;
 CREATE DATABASE glasscore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE glasscore_db;
 
--- -------------------- EMPLEADOS --------------------
 CREATE TABLE empleado (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     nombre          VARCHAR(100) NOT NULL,
@@ -18,7 +15,6 @@ CREATE TABLE empleado (
     activo          TINYINT(1) NOT NULL DEFAULT 1
 );
 
--- -------------------- HERRAMIENTAS --------------------
 CREATE TABLE herramienta (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     codigo          VARCHAR(50) NOT NULL UNIQUE,
@@ -31,7 +27,6 @@ CREATE TABLE herramienta (
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- -------------------- MATERIALES (bodega) --------------------
 CREATE TABLE material (
     id               INT AUTO_INCREMENT PRIMARY KEY,
     nombre           VARCHAR(100) NOT NULL,
@@ -41,7 +36,6 @@ CREATE TABLE material (
     precio_unitario  DECIMAL(12,2) NOT NULL
 );
 
--- -------------------- COTIZACIONES --------------------
 CREATE TABLE cotizacion (
     id                INT AUTO_INCREMENT PRIMARY KEY,
     cliente           VARCHAR(150) NOT NULL,
@@ -56,7 +50,6 @@ CREATE TABLE cotizacion (
     fecha             DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- -------------------- PLANILLA (histórico) --------------------
 CREATE TABLE planilla (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     empleado_id   INT NOT NULL,
@@ -70,7 +63,6 @@ CREATE TABLE planilla (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- -------------------- VEHÍCULOS --------------------
 CREATE TABLE vehiculo (
     id                       INT AUTO_INCREMENT PRIMARY KEY,
     placa                    VARCHAR(20) NOT NULL UNIQUE,
@@ -83,7 +75,6 @@ CREATE TABLE vehiculo (
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- -------------------- VIAJES / DESPACHOS --------------------
 CREATE TABLE viaje (
     id                   INT AUTO_INCREMENT PRIMARY KEY,
     vehiculo_id          INT NOT NULL,
@@ -104,36 +95,32 @@ CREATE TABLE viaje (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- ============================================================
--- DATOS DE PRUEBA
--- ============================================================
-
 INSERT INTO empleado (nombre, apellido, cargo, salario_base, telefono) VALUES
-('Carlos',  'Mejía',     'CHOFER',          12500.00, '9876-1101'),
-('Luis',    'Pineda',    'CHOFER',          12000.00, '9876-1102'),
-('María',   'López',     'INSTALADOR',      11000.00, '9876-2201'),
-('José',    'Hernández', 'INSTALADOR',      10800.00, '9876-2202'),
-('Ana',     'García',    'SUPERVISOR',      16000.00, '9876-3301'),
-('Pedro',   'Ramírez',   'ADMINISTRATIVO',  9500.00,  '9876-4401');
+('Carlos', 'Mejía',     'CHOFER',         12500.00, '9876-1101'),
+('Luis',   'Pineda',    'CHOFER',         12000.00, '9876-1102'),
+('María',  'López',     'INSTALADOR',     11000.00, '9876-2201'),
+('José',   'Hernández', 'INSTALADOR',     10800.00, '9876-2202'),
+('Ana',    'García',    'SUPERVISOR',     16000.00, '9876-3301'),
+('Pedro',  'Ramírez',   'ADMINISTRATIVO', 9500.00,  '9876-4401');
 
 INSERT INTO herramienta (codigo, nombre, tipo, estado) VALUES
-('HER-001', 'Taladro industrial Bosch',     'TALADRO',   'DISPONIBLE'),
-('HER-002', 'Cortadora de vidrio Diamond',  'CORTADORA', 'DISPONIBLE'),
-('HER-003', 'Ventosa industrial 200kg',     'VENTOSA',   'DISPONIBLE'),
-('HER-004', 'Ventosa industrial 150kg',     'VENTOSA',   'DISPONIBLE'),
-('HER-005', 'Amoladora Makita',             'AMOLADORA', 'DISPONIBLE'),
-('HER-006', 'Nivel láser Bosch',            'NIVEL',     'DISPONIBLE');
+('HER-001', 'Taladro industrial Bosch',    'TALADRO',   'DISPONIBLE'),
+('HER-002', 'Cortadora de vidrio Diamond', 'CORTADORA', 'DISPONIBLE'),
+('HER-003', 'Ventosa industrial 200kg',    'VENTOSA',   'DISPONIBLE'),
+('HER-004', 'Ventosa industrial 150kg',    'VENTOSA',   'DISPONIBLE'),
+('HER-005', 'Amoladora Makita',            'AMOLADORA', 'DISPONIBLE'),
+('HER-006', 'Nivel láser Bosch',           'NIVEL',     'DISPONIBLE');
 
 INSERT INTO material (nombre, tipo, unidad, stock, precio_unitario) VALUES
-('Vidrio templado 6mm',     'VIDRIO',   'M2', 25.000, 450.00),
-('Vidrio laminado 8mm',     'VIDRIO',   'M2', 18.000, 620.00),
-('Perfil aluminio natural', 'ALUMINIO', 'ML', 80.000, 95.00),
-('Perfil aluminio negro',   'ALUMINIO', 'ML', 60.000, 110.00),
-('Marco metálico galvanizado','METAL',  'ML', 50.000, 75.00);
+('Vidrio templado 6mm',       'VIDRIO',   'M2', 25.000, 450.00),
+('Vidrio laminado 8mm',       'VIDRIO',   'M2', 18.000, 620.00),
+('Perfil aluminio natural',   'ALUMINIO', 'ML', 80.000, 95.00),
+('Perfil aluminio negro',     'ALUMINIO', 'ML', 60.000, 110.00),
+('Marco metálico galvanizado','METAL',    'ML', 50.000, 75.00);
 
 INSERT INTO vehiculo (placa, marca, km_actual, km_limite_mantenimiento, chofer_id) VALUES
-('HND-4521', 'Toyota Hilux',   98450, 100000, 1),
+('HND-4521', 'Toyota Hilux',    98450, 100000, 1),
 ('HND-3388', 'Nissan Frontier', 45200,  60000, 2),
-('HND-9910', 'Isuzu D-Max',    19800,  25000, NULL);
+('HND-9910', 'Isuzu D-Max',     19800,  25000, NULL);
 
 SELECT 'Base de datos glasscore_db creada correctamente' AS mensaje;

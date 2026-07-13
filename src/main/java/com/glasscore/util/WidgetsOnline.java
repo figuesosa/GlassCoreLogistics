@@ -9,9 +9,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Clima Tegucigalpa vía Open-Meteo (sin API key) y tipo de cambio vía open.er-api.com.
- */
 public final class WidgetsOnline {
 
     private static final HttpClient CLIENT = HttpClient.newBuilder()

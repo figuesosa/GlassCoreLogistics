@@ -9,9 +9,6 @@ import com.glasscore.modelo.Planilla;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Cierre de planilla: salario base desde BD + horas extras + viáticos = neto.
- */
 public class PlanillaServicio {
 
     private final EmpleadoDAO empleadoDAO = new EmpleadoDAOImpl();

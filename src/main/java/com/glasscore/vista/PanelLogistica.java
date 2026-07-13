@@ -229,9 +229,8 @@ public class PanelLogistica extends JPanel {
                     "Despacho", JOptionPane.INFORMATION_MESSAGE);
             refrescar();
         } catch (LogisticaServicio.MantenimientoRequeridoException mre) {
-            // Regla de negocio 2: bloqueo con ERROR_MESSAGE
             JOptionPane.showMessageDialog(this, mre.getMessage(),
-                    "Bloqueo de Seguridad — Mantenimiento Preventivo",
+                    "Bloqueo de Seguridad - Mantenimiento Preventivo",
                     JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

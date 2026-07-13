@@ -6,9 +6,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * Conexión singleton JDBC hacia MySQL (patrón DAO).
- */
 public final class ConexionDB {
 
     private static final Properties PROPS = new Properties();
@@ -16,12 +13,12 @@ public final class ConexionDB {
     static {
         try (InputStream in = ConexionDB.class.getClassLoader().getResourceAsStream("db.properties")) {
             if (in == null) {
-                throw new IllegalStateException("No se encontró db.properties en resources");
+                throw new IllegalStateException("No se encontro db.properties en resources");
             }
             PROPS.load(in);
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (Exception e) {
-            throw new ExceptionInInitializerError("Error cargando configuración DB: " + e.getMessage());
+            throw new ExceptionInInitializerError("Error cargando configuracion DB: " + e.getMessage());
         }
     }
 

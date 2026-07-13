@@ -12,18 +12,12 @@ import com.glasscore.modelo.Viaje;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Logística: ruta fija TGU-CMY (85 km / 170 redondo),
- * cálculo de combustible y bloqueo por mantenimiento preventivo.
- */
 public class LogisticaServicio {
 
     public static final String RUTA_FIJA = "Tegucigalpa - Comayagua";
     public static final int KM_SIMPLE = 85;
     public static final int KM_REDONDO = 170;
-    /** Litros por kilómetro (factor base de rendimiento). */
     public static final double FACTOR_RENDIMIENTO = 0.12;
-    /** Precio combustible en Lempiras por litro. */
     public static final double PRECIO_COMBUSTIBLE_LPS = 32.50;
 
     private final VehiculoDAO vehiculoDAO = new VehiculoDAOImpl();
@@ -49,10 +43,6 @@ public class LogisticaServicio {
         return new ResultadoCalculo(km, litros, gasto);
     }
 
-    /**
-     * Bloqueo de seguridad: si km_actual + km_ruta >= km_limite, lanza excepción
-     * para que la vista muestre JOptionPane.ERROR_MESSAGE.
-     */
     public Viaje autorizarYRegistrarViaje(int vehiculoId, boolean redondo) throws Exception {
         Vehiculo veh = vehiculoDAO.buscarPorId(vehiculoId);
         if (veh == null) {

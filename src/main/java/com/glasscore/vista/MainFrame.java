@@ -38,7 +38,7 @@ public class MainFrame extends JFrame {
     private final JLabel lblDivisas = new JLabel("Cargando divisas…");
 
     public MainFrame() {
-        super("GlassCore Logistics — Vidriería Industrial");
+        super("GlassCore Logistics - Vidrieria Industrial");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1180, 760));
         setLocationRelativeTo(null);
@@ -89,7 +89,7 @@ public class MainFrame extends JFrame {
         try (Connection cn = ConexionDB.getConnection()) {
             return "MySQL: conectado";
         } catch (Exception e) {
-            return "MySQL: sin conexión — revise db.properties";
+            return "MySQL: sin conexion - revise db.properties";
         }
     }
 
@@ -127,7 +127,6 @@ public class MainFrame extends JFrame {
         home.setBackground(UITheme.BG);
         home.setBorder(new EmptyBorder(20, 32, 24, 32));
 
-        // Logo e instrucción de navegación
         JPanel hero = new JPanel(new BorderLayout(0, 10));
         hero.setOpaque(false);
 
@@ -271,14 +270,14 @@ public class MainFrame extends JFrame {
             } catch (Exception ignored) {
             }
             try (Connection cn = ConexionDB.getConnection()) {
-                // ok
+                // conexion OK
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null,
                         "No se pudo conectar a MySQL.\n\n"
                         + "1) Ejecute sql/glasscore_db.sql en MySQL Workbench\n"
                         + "2) Configure usuario/clave en src/main/resources/db.properties\n\n"
                         + e.getMessage(),
-                        "GlassCore — Conexión", JOptionPane.ERROR_MESSAGE);
+                        "GlassCore - Conexion", JOptionPane.ERROR_MESSAGE);
             }
             MainFrame frame = new MainFrame();
             frame.setVisible(true);

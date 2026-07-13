@@ -9,9 +9,6 @@ import com.glasscore.modelo.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Cotización con manufactura flexible: permite guardar aunque el stock sea insuficiente.
- */
 public class CotizacionServicio {
 
     private final CotizacionDAO cotizacionDAO = new CotizacionDAOImpl();

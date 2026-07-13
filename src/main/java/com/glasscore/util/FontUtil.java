@@ -27,14 +27,6 @@ public final class FontUtil {
             }
         } catch (Exception ignored) {
         }
-        try (InputStream in = FontUtil.class.getResourceAsStream("/fonts/Safira March Personal Use Only.ttf")) {
-            if (in != null) {
-                safiraBase = Font.createFont(Font.TRUETYPE_FONT, in);
-                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(safiraBase);
-                return;
-            }
-        } catch (Exception ignored) {
-        }
 
         for (String family : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
             if (family.toLowerCase(Locale.ROOT).contains("safira")) {

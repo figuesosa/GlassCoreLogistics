@@ -128,9 +128,6 @@ public class HerramientaDAOImpl implements HerramientaDAO {
         return lista;
     }
 
-    /**
-     * Regla: al asignar, estado pasa automáticamente de DISPONIBLE a ASIGNADA.
-     */
     @Override
     public boolean asignar(int herramientaId, int empleadoId) throws Exception {
         String sql = "UPDATE herramienta SET estado='ASIGNADA', empleado_id=? "

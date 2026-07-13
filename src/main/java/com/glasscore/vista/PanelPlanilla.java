@@ -249,7 +249,7 @@ public class PanelPlanilla extends JPanel {
             lblNeto.setText(String.format("Neto: Lps %.2f  (base %.2f + extras %.2f + viáticos %.2f)",
                     neto, emp.getSalarioBase(), extras, viaticos));
         } catch (Exception ignored) {
-            lblNeto.setText("Neto: —");
+            lblNeto.setText("Neto: -");
         }
     }
 

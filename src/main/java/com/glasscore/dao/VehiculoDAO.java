@@ -1,6 +1,7 @@
 package com.glasscore.dao;
 
 import com.glasscore.modelo.Vehiculo;
+import java.sql.Connection;
 import java.util.List;
 
 public interface VehiculoDAO {
@@ -10,4 +11,5 @@ public interface VehiculoDAO {
     Vehiculo buscarPorId(int id) throws Exception;
     List<Vehiculo> listarTodos() throws Exception;
     boolean actualizarKilometraje(int vehiculoId, int nuevoKm) throws Exception;
+    boolean actualizarKilometraje(Connection cn, int vehiculoId, int nuevoKm) throws Exception;
 }

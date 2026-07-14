@@ -1,5 +1,6 @@
 package com.glasscore.servicio;
 
+import com.glasscore.conexion.ConexionDB;
 import com.glasscore.dao.HerramientaDAO;
 import com.glasscore.dao.VehiculoDAO;
 import com.glasscore.dao.ViajeDAO;
@@ -9,6 +10,7 @@ import com.glasscore.dao.impl.ViajeDAOImpl;
 import com.glasscore.modelo.Herramienta;
 import com.glasscore.modelo.Vehiculo;
 import com.glasscore.modelo.Viaje;
+import java.sql.Connection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,11 +88,29 @@ public class LogisticaServicio {
                     .collect(Collectors.joining(", "));
         viaje.setHerramientasCustodia(custodia);
 
-        int id = viajeDAO.insertar(viaje);
-        viaje.setId(id);
-
-        vehiculoDAO.actualizarKilometraje(veh.getId(), proyeccion);
-        return viaje;
+        Connection cn = ConexionDB.getConnection();
+        try {
+            cn.setAutoCommit(false);
+            int id = viajeDAO.insertar(cn, viaje);
+            viaje.setId(id);
+            vehiculoDAO.actualizarKilometraje(cn, veh.getId(), proyeccion);
+            cn.commit();
+            return viaje;
+        } catch (Exception ex) {
+            try {
+                cn.rollback();
+            } catch (Exception ignored) {
+                // ya se re-lanza el error original
+            }
+            throw ex;
+        } finally {
+            try {
+                cn.setAutoCommit(true);
+            } catch (Exception ignored) {
+                // cierre final
+            }
+            cn.close();
+        }
     }
 
     public List<Viaje> listarViajes() throws Exception {

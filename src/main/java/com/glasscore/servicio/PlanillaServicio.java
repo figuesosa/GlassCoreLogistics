@@ -45,6 +45,10 @@ public class PlanillaServicio {
         return planillaDAO.listarTodas();
     }
 
+    public boolean tienePlanilla(int empleadoId) throws Exception {
+        return !planillaDAO.listarPorEmpleado(empleadoId).isEmpty();
+    }
+
     public Planilla buscar(int id) throws Exception {
         return planillaDAO.buscarPorId(id);
     }

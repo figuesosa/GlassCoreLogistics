@@ -282,6 +282,13 @@ public class PanelPlanilla extends JPanel {
                         "Validación", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            if (!planillaServicio.tienePlanilla(emp.getId())) {
+                JOptionPane.showMessageDialog(this,
+                        emp.getNombreCompleto() + " no tiene planilla registrada.\n"
+                        + "Cierre una planilla primero o elija otro empleado (ej. Carlos Mejía, María López).",
+                        "Sin planilla", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             ReporteUtil.generarComprobantePlanilla(emp.getId());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
@@ -303,14 +310,21 @@ public class PanelPlanilla extends JPanel {
             modeloEmp.setRowCount(0);
             List<Empleado> empleados = empleadoDAO.listarTodos();
             DefaultComboBoxModel<Empleado> model = new DefaultComboBoxModel<>();
+            Empleado preferido = null;
             for (Empleado e : empleados) {
                 modeloEmp.addRow(new Object[]{
                     e.getId(), e.getNombre(), e.getApellido(), e.getCargo(),
                     e.getSalarioBase(), e.getTelefono()
                 });
                 model.addElement(e);
+                if (preferido == null && planillaServicio.tienePlanilla(e.getId())) {
+                    preferido = e;
+                }
             }
             cmbEmpleadoPago.setModel(model);
+            if (preferido != null) {
+                cmbEmpleadoPago.setSelectedItem(preferido);
+            }
 
             modeloPlanilla.setRowCount(0);
             for (Planilla p : planillaServicio.listarHistorico()) {

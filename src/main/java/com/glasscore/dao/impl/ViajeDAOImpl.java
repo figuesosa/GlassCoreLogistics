@@ -21,11 +21,17 @@ public class ViajeDAOImpl implements ViajeDAO {
 
     @Override
     public int insertar(Viaje v) throws Exception {
+        try (Connection cn = ConexionDB.getConnection()) {
+            return insertar(cn, v);
+        }
+    }
+
+    @Override
+    public int insertar(Connection cn, Viaje v) throws Exception {
         String sql = "INSERT INTO viaje (vehiculo_id, chofer_id, ruta, es_redondo, kilometros, "
                 + "factor_rendimiento, precio_combustible, litros_estimados, gasto_combustible) "
                 + "VALUES (?,?,?,?,?,?,?,?,?)";
-        try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, v.getVehiculoId());
             ps.setInt(2, v.getChoferId());
             ps.setString(3, v.getRuta());

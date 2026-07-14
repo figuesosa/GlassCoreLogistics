@@ -113,6 +113,7 @@ public class PanelLogistica extends JPanel {
                 txtMarca.setText(String.valueOf(modeloVeh.getValueAt(row, 2)));
                 txtKmActual.setText(String.valueOf(modeloVeh.getValueAt(row, 3)));
                 txtKmLimite.setText(String.valueOf(modeloVeh.getValueAt(row, 4)));
+                sincronizarChoferSeleccionado(vehiculoEditando);
             }
         });
 
@@ -162,6 +163,29 @@ public class PanelLogistica extends JPanel {
 
         refrescar();
         actualizarCalculo();
+    }
+
+    private void sincronizarChoferSeleccionado(Integer vehiculoId) {
+        try {
+            cmbChofer.setSelectedItem(null);
+            if (vehiculoId == null) {
+                return;
+            }
+            Vehiculo v = vehiculoDAO.buscarPorId(vehiculoId);
+            if (v == null || v.getChoferId() == null) {
+                return;
+            }
+            for (int i = 0; i < cmbChofer.getItemCount(); i++) {
+                Empleado e = cmbChofer.getItemAt(i);
+                if (e != null && e.getId() == v.getChoferId()) {
+                    cmbChofer.setSelectedIndex(i);
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo cargar el chofer: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void guardarVehiculo(boolean actualizar) {

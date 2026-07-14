@@ -101,9 +101,15 @@ public class VehiculoDAOImpl implements VehiculoDAO {
 
     @Override
     public boolean actualizarKilometraje(int vehiculoId, int nuevoKm) throws Exception {
+        try (Connection cn = ConexionDB.getConnection()) {
+            return actualizarKilometraje(cn, vehiculoId, nuevoKm);
+        }
+    }
+
+    @Override
+    public boolean actualizarKilometraje(Connection cn, int vehiculoId, int nuevoKm) throws Exception {
         String sql = "UPDATE vehiculo SET km_actual=? WHERE id=?";
-        try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, nuevoKm);
             ps.setInt(2, vehiculoId);
             return ps.executeUpdate() > 0;

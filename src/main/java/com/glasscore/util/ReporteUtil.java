@@ -46,12 +46,22 @@ public final class ReporteUtil {
             Path pdf = outDir.resolve(nombreSalida + ".pdf");
             JasperExportManager.exportReportToPdfFile(print, pdf.toString());
 
+            if (print.getPages() == null || print.getPages().isEmpty()) {
+                throw new IllegalStateException(
+                        "El reporte no tiene datos (PDF en blanco). Verifique parámetros o registros en la base.");
+            }
+
             JasperViewer viewer = new JasperViewer(print, false);
             viewer.setTitle("GlassCore - " + nombreSalida);
             viewer.setVisible(true);
 
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(pdf.toFile());
+            try {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(pdf.toFile());
+                }
+            } catch (Exception openEx) {
+                System.err.println("PDF generado en " + pdf + " (visor del sistema no disponible): "
+                        + openEx.getMessage());
             }
         }
     }

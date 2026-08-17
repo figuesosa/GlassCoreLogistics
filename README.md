@@ -36,7 +36,7 @@ SOURCE sql/glasscore_db.sql;
 
 Si la base está vacía, al arrancar se crean tablas, parámetros fiscales demo y los 12 módulos.
 
-## Módulos (enunciado UTH Avanzada II)
+## Módulos
 
 1. **Acceso y roles** — autenticación y perfiles Admin / Contador / Cajero
 2. **Fiscal SAR** — RTN, CAI, fecha límite, rango y correlativo automático

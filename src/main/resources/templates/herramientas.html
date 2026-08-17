@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Herramientas')}"></head>
+<body>
+<header th:replace="~{fragments :: top('herramientas')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Herramientas</h1>
+
+    <div class="grid-2">
+        <section class="card">
+            <h2>Registrar</h2>
+            <form th:action="@{/herramientas/registrar}" method="post" class="form-grid">
+                <label>ID para editar <input name="id" type="number" placeholder="vacío = nuevo"></label>
+                <label>Código <input name="codigo" required placeholder="HER-016"></label>
+                <label>Nombre <input name="nombre" required></label>
+                <label>Tipo <input name="tipo" required placeholder="TALADRO"></label>
+                <button class="btn btn-primary" type="submit">Guardar herramienta</button>
+            </form>
+        </section>
+        <section class="card">
+            <h2>Asignar / devolver</h2>
+            <form th:action="@{/herramientas/asignar}" method="post" class="form-grid">
+                <label>Herramienta disponible
+                    <select name="herramientaId" required>
+                        <option value="">— seleccionar —</option>
+                        <option th:each="h : ${disponibles}" th:value="${h.id}"
+                                th:text="${h.codigo} + ' · ' + ${h.nombre}"></option>
+                    </select>
+                </label>
+                <label>Chofer / instalador
+                    <select name="empleadoId" required>
+                        <option value="">— seleccionar —</option>
+                        <option th:each="e : ${empleados}" th:value="${e.id}"
+                                th:text="${e.nombreCompleto} + ' (' + ${e.cargo} + ')'"></option>
+                    </select>
+                </label>
+                <button class="btn btn-accent" type="submit">Asignar a obra</button>
+            </form>
+            <form th:action="@{/herramientas/devolver}" method="post" class="form-grid" style="margin-top:1rem">
+                <label>Devolver a bodega
+                    <select name="herramientaId" required>
+                        <option value="">— seleccionar —</option>
+                        <option th:each="h : ${herramientas}" th:if="${h.estado == 'ASIGNADA'}"
+                                th:value="${h.id}"
+                                th:text="${h.codigo} + ' · ' + ${h.nombre}"></option>
+                    </select>
+                </label>
+                <button class="btn btn-danger" type="submit">Devolver a bodega</button>
+            </form>
+        </section>
+    </div>
+
+    <section class="card">
+        <h2>Inventario</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>ID</th><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Responsable</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${herramientas}">
+                    <td th:text="${h.id}"></td>
+                    <td th:text="${h.codigo}"></td>
+                    <td th:text="${h.nombre}"></td>
+                    <td th:text="${h.tipo}"></td>
+                    <td><span th:class="${h.estado=='ASIGNADA'} ? 'badge busy' : 'badge ok'" th:text="${h.estado}"></span></td>
+                    <td th:text="${h.empleadoNombre} ?: '—'"></td>
+                    <td>
+                        <form th:action="@{/herramientas/borrar}" method="post">
+                            <input type="hidden" name="id" th:value="${h.id}">
+                            <button class="btn btn-danger" type="submit">Borrar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

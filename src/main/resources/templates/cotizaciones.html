@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Cotizaciones')}"></head>
+<body>
+<header th:replace="~{fragments :: top('cotizaciones')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Cotizaciones</h1>
+    <p class="lead">Vidrio en bodega: <strong th:text="${#numbers.formatDecimal(stockVidrio,1,3)} + ' m²'"></strong>. Si el área pasa el stock, sale alerta de compra y la cotización se guarda igual.</p>
+
+    <div class="grid-2">
+        <section class="card">
+            <h2>Nueva cotización</h2>
+            <form th:action="@{/cotizaciones/guardar}" method="post" class="form-grid">
+                <label>Cliente <input name="cliente" required></label>
+                <label>Estructura
+                    <select name="tipoEstructura">
+                        <option>VENTANA</option>
+                        <option>PUERTA</option>
+                        <option>BALCON</option>
+                    </select>
+                </label>
+                <label>Ancho (m) <input name="ancho" required value="8"></label>
+                <label>Alto (m) <input name="alto" required value="4"></label>
+                <button class="btn btn-primary" type="submit">Calcular y guardar</button>
+            </form>
+        </section>
+        <section class="card">
+            <h2>Stock bodega</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr><th>Material</th><th>Tipo</th><th>Unidad</th><th>Stock</th><th>Precio Lps</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${materiales}">
+                        <td th:text="${m.nombre}"></td>
+                        <td th:text="${m.tipo}"></td>
+                        <td th:text="${m.unidad}"></td>
+                        <td th:text="${#numbers.formatDecimal(m.stock,1,3)}"></td>
+                        <td th:text="${#numbers.formatDecimal(m.precioUnitario,1,2)}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <section class="card">
+        <h2>Historial</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th><th>Cliente</th><th>Tipo</th><th>Ancho</th><th>Alto</th>
+                    <th>m²</th><th>ML Alum.</th><th>ML Metal</th><th>Subtotal</th><th>Alerta</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${cotizaciones}">
+                    <td th:text="${c.id}"></td>
+                    <td th:text="${c.cliente}"></td>
+                    <td th:text="${c.tipoEstructura}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.ancho,1,3)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.alto,1,3)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.areaVidrio,1,3)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.metrosAluminio,1,3)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.metrosMetal,1,3)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.subtotal,1,2)}"></td>
+                    <td><span th:if="${c.alertaCompra}" class="badge warn">ALERTA</span><span th:unless="${c.alertaCompra}">—</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

@@ -33,6 +33,26 @@ public final class WidgetsOnline {
             this.humedad = humedad;
             this.vientoKmh = vientoKmh;
         }
+
+        public String getUbicacion() {
+            return ubicacion;
+        }
+
+        public String getCondicion() {
+            return condicion;
+        }
+
+        public double getTemperaturaC() {
+            return temperaturaC;
+        }
+
+        public int getHumedad() {
+            return humedad;
+        }
+
+        public double getVientoKmh() {
+            return vientoKmh;
+        }
     }
 
     public static final class DivisaInfo {
@@ -46,6 +66,22 @@ public final class WidgetsOnline {
             this.usdToEur = usdToEur;
             this.usdToGtq = usdToGtq;
             this.actualizado = actualizado;
+        }
+
+        public double getUsdToHnl() {
+            return usdToHnl;
+        }
+
+        public double getUsdToEur() {
+            return usdToEur;
+        }
+
+        public double getUsdToGtq() {
+            return usdToGtq;
+        }
+
+        public String getActualizado() {
+            return actualizado;
         }
     }
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head th:replace="~{fragments :: head('Inicio')}"></head>
+<body>
+<header th:replace="~{fragments :: top('inicio')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Inicio</h1>
+    <p class="lead">Vidriería GlassCore. Cotización por medida, planilla, herramientas y despacho TGU-Comayagua.</p>
+    <div class="grid-2">
+        <section class="card">
+            <h2>Clima en Tegucigalpa</h2>
+            <p th:if="${climaError}" class="muted" th:text="${climaError}"></p>
+            <div th:if="${clima}">
+                <p class="big" th:text="${#numbers.formatDecimal(clima.temperaturaC,1,1)} + ' °C'"></p>
+                <p th:text="${clima.condicion}"></p>
+                <p class="muted" th:text="'Humedad ' + ${clima.humedad} + '% · Viento ' + ${#numbers.formatDecimal(clima.vientoKmh,1,1)} + ' km/h'"></p>
+            </div>
+        </section>
+        <section class="card">
+            <h2>Tipo de cambio USD</h2>
+            <p th:if="${divisaError}" class="muted" th:text="${divisaError}"></p>
+            <ul th:if="${divisa}" class="rates">
+                <li>HNL (Lps) <strong th:text="${#numbers.formatDecimal(divisa.usdToHnl,1,2)}"></strong></li>
+                <li>EUR <strong th:text="${#numbers.formatDecimal(divisa.usdToEur,1,4)}"></strong></li>
+                <li>GTQ <strong th:text="${#numbers.formatDecimal(divisa.usdToGtq,1,4)}"></strong></li>
+            </ul>
+            <p class="muted" th:if="${divisa}" th:text="'Actualizado: ' + ${divisa.actualizado}"></p>
+        </section>
+    </div>
+    <section class="card">
+        <h2>Módulos</h2>
+        <div class="modulos">
+            <a class="mod" th:href="@{/herramientas}">Herramientas<br><span>Asignar y devolver</span></a>
+            <a class="mod" th:href="@{/cotizaciones}">Cotizaciones<br><span>Ancho x alto</span></a>
+            <a class="mod" th:href="@{/planilla}" sec:authorize="hasRole('ADMIN')">Planilla<br><span>Empleados y pagos</span></a>
+            <a class="mod" th:href="@{/usuarios}" sec:authorize="hasRole('ADMIN')">Usuarios<br><span>Crear y borrar accesos</span></a>
+            <a class="mod" th:href="@{/logistica}">Logística<br><span>Vehículos y combustible</span></a>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

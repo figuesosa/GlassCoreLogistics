@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#273877">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/logo.svg}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Ingreso - GlassCore</title>
+</head>
+<body class="login-body">
+<div class="login-card">
+    <img th:src="@{/img/logo.svg}" alt="GlassCore" width="56" height="56">
+    <h1>GlassCore</h1>
+    <p class="muted">Vidriería industrial</p>
+    <div th:if="${error}" class="flash err" th:text="${error}"></div>
+    <div th:if="${mensaje}" class="flash ok" th:text="${mensaje}"></div>
+    <form th:action="@{/login}" method="post">
+        <label>Usuario
+            <input type="text" name="username" autocomplete="username" required autofocus>
+        </label>
+        <label>Contraseña
+            <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+    <p class="hint">admin / admin123 &nbsp;|&nbsp; operador / operador123</p>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

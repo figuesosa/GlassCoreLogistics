@@ -1,5 +1,5 @@
--- GlassCore Logistics
--- Script de base de datos para MySQL Workbench
+-- glasscore_db
+-- MySQL Workbench
 
 DROP DATABASE IF EXISTS glasscore_db;
 CREATE DATABASE glasscore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -169,4 +169,16 @@ INSERT INTO viaje (vehiculo_id, chofer_id, ruta, es_redondo, kilometros, factor_
 (4, 7, 'Tegucigalpa - Comayagua (Redondo)', 1, 170, 0.12, 32.50, 20.400, 663.00, '2026-07-02 08:00:00'),
 (2, 2, 'Tegucigalpa - Comayagua (Simple)', 0, 85, 0.12, 32.50, 10.200, 331.50, '2026-07-10 06:45:00');
 
-SELECT 'Base de datos glasscore_db creada correctamente' AS mensaje;
+CREATE TABLE usuario (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    username       VARCHAR(50) NOT NULL UNIQUE,
+    password_hash  VARCHAR(100) NOT NULL,
+    rol            ENUM('ADMIN','OPERADOR') NOT NULL,
+    empleado_id    INT NULL,
+    activo         TINYINT(1) NOT NULL DEFAULT 1,
+    CONSTRAINT fk_usuario_empleado
+        FOREIGN KEY (empleado_id) REFERENCES empleado(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+SELECT 'glasscore_db lista' AS mensaje;

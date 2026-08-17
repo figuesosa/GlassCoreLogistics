@@ -36,6 +36,18 @@ public class LogisticaServicio {
             this.litros = litros;
             this.gastoLps = gastoLps;
         }
+
+        public int getKilometros() {
+            return kilometros;
+        }
+
+        public double getLitros() {
+            return litros;
+        }
+
+        public double getGastoLps() {
+            return gastoLps;
+        }
     }
 
     public ResultadoCalculo calcularRuta(boolean redondo) {

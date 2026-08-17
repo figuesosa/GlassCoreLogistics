@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Acceso denegado')}"></head>
+<body>
+<header th:replace="~{fragments :: top('')}"></header>
+<main class="page">
+    <section class="card">
+        <h1 class="page-title">Sin permiso</h1>
+        <p>Planilla y salarios son solo para el usuario admin.</p>
+        <a class="btn btn-primary" th:href="@{/}">Volver al inicio</a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Usuarios')}"></head>
+<body>
+<header th:replace="~{fragments :: top('usuarios')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Usuarios</h1>
+    <p class="lead">Cuentas para entrar al sistema.</p>
+
+    <section class="card">
+        <h2>Crear o editar</h2>
+        <form th:action="@{/usuarios/guardar}" method="post" class="form-grid">
+            <label>ID para editar <input name="id" type="number" placeholder="vacío = nuevo"></label>
+            <label>Usuario <input name="username" required></label>
+            <label>Contraseña <input name="password" type="password" placeholder="obligatoria al crear"></label>
+            <label>Rol
+                <select name="rol">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="OPERADOR">OPERADOR</option>
+                </select>
+            </label>
+            <label>Empleado ligado
+                <select name="empleadoId">
+                    <option value="">— ninguno —</option>
+                    <option th:each="e : ${empleados}" th:value="${e.id}" th:text="${e.nombreCompleto}"></option>
+                </select>
+            </label>
+            <label>Activo
+                <select name="activo">
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                </select>
+            </label>
+            <button class="btn btn-primary" type="submit">Guardar</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Registrados</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Empleado</th><th>Activo</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.id}"></td>
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.rol}"></td>
+                    <td th:text="${u.empleadoNombre} ?: '—'"></td>
+                    <td th:text="${u.activo} ? 'Sí' : 'No'"></td>
+                    <td>
+                        <form th:action="@{/usuarios/borrar}" method="post">
+                            <input type="hidden" name="id" th:value="${u.id}">
+                            <button class="btn btn-danger" type="submit">Borrar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

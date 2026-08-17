@@ -179,7 +179,6 @@ td { padding: 0.35rem 0.5rem; border-bottom: 1px solid #ccc; }
 }
 .login-card form { display: grid; gap: 0.7rem; text-align: left; margin-top: 0.9rem; }
 .login-card .btn-primary { width: 100%; }
-.hint { font-size: 0.8rem; color: #555; margin-top: 0.9rem; }
 @media (min-width: 720px) {
   .form-grid.two { grid-template-columns: 1fr 1fr; }
   .table-search { width: 280px; }

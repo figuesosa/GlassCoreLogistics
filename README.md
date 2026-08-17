@@ -11,13 +11,6 @@ Demo: [https://glasscorelogistics.onrender.com](https://glasscorelogistics.onren
 - JasperReports (PDF de planilla y hoja de ruta)
 - Maven / NetBeans
 
-## Cuentas demo
-
-| Usuario   | Contraseña | Rol      |
-|-----------|------------|----------|
-| `admin`   | `admin123` | ADMIN    |
-| `operador`| `operador123` | OPERADOR |
-
 El admin ve planilla y usuarios. El operador no.
 
 ## Cómo correrla en local

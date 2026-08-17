@@ -7,6 +7,54 @@
     <div th:replace="~{fragments :: flashes}"></div>
     <h1 class="page-title">Inicio</h1>
     <p class="lead">Vidriería GlassCore. Cotización por medida, planilla, herramientas y despacho TGU-Comayagua.</p>
+
+    <div class="grid-2">
+        <section class="card">
+            <h2>Stock bajo</h2>
+            <p th:if="${stockBajo == null or stockBajo.isEmpty()}" class="muted">Sin alertas de inventario.</p>
+            <ul th:if="${stockBajo != null and !stockBajo.isEmpty()}" class="alert-list">
+                <li th:each="m : ${stockBajo}">
+                    <strong th:text="${m.nombre}">material</strong>
+                    <span class="badge warn" th:text="${#numbers.formatDecimal(m.stock,1,3)} + ' ' + ${m.unidad}"></span>
+                    <span class="muted" th:text="${m.tipo}"></span>
+                </li>
+            </ul>
+        </section>
+        <section class="card">
+            <h2>Mantenimiento de flota</h2>
+            <p th:if="${mantenimiento == null or mantenimiento.isEmpty()}" class="muted">Ningún vehículo cerca del límite.</p>
+            <ul th:if="${mantenimiento != null and !mantenimiento.isEmpty()}" class="alert-list">
+                <li th:each="v : ${mantenimiento}">
+                    <strong th:text="${v.placa} + ' · ' + ${v.marca}">placa</strong>
+                    <span class="badge warn" th:text="${v.kmRestantes} + ' km restantes'"></span>
+                    <span class="muted" th:text="'km ' + ${v.kmActual} + ' / ' + ${v.kmLimiteMantenimiento}"></span>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <section class="card">
+        <h2>Cotizaciones recientes</h2>
+        <p th:if="${cotizacionesRecientes == null or cotizacionesRecientes.isEmpty()}" class="muted">Aún no hay cotizaciones.</p>
+        <div class="table-wrap" th:if="${cotizacionesRecientes != null and !cotizacionesRecientes.isEmpty()}">
+            <table>
+                <thead>
+                <tr><th>Cliente</th><th>Tipo</th><th>m²</th><th>Subtotal</th><th>Fecha</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${cotizacionesRecientes}">
+                    <td th:text="${c.cliente}"></td>
+                    <td th:text="${c.tipoEstructura}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.areaVidrio,1,3)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.subtotal,1,2)}"></td>
+                    <td th:text="${c.fecha != null ? #temporals.format(c.fecha, 'dd/MM/yyyy') : '—'}"></td>
+                    <td><span th:if="${c.alertaCompra}" class="badge warn">ALERTA</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <div class="grid-2">
         <section class="card">
             <h2>Clima en Tegucigalpa</h2>

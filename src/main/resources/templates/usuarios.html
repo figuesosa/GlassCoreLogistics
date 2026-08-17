@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 <head th:replace="~{fragments :: head('Usuarios')}"></head>
 <body>
 <header th:replace="~{fragments :: top('usuarios')}"></header>
 <main class="page">
     <div th:replace="~{fragments :: flashes}"></div>
     <h1 class="page-title">Usuarios</h1>
-    <p class="lead">Cuentas para entrar al sistema.</p>
+    <p class="lead">Cuentas para entrar al sistema. Solo el admin ve esta pantalla.</p>
 
     <section class="card">
-        <h2>Crear o editar</h2>
-        <form th:action="@{/usuarios/guardar}" method="post" class="form-grid">
-            <label>ID para editar <input name="id" type="number" placeholder="vacío = nuevo"></label>
-            <label>Usuario <input name="username" required></label>
-            <label>Contraseña <input name="password" type="password" placeholder="obligatoria al crear"></label>
+        <h2 data-form-title data-new-label="Crear usuario" data-edit-label="Editar usuario">Crear usuario</h2>
+        <form id="form-usuario" th:action="@{/usuarios/guardar}" method="post" class="form-grid two">
+            <input type="hidden" name="id">
+            <label>Usuario <input name="username" required autocomplete="off"></label>
+            <label>Contraseña
+                <input name="password" type="password" placeholder="obligatoria al crear; vacía = no cambiar">
+            </label>
             <label>Rol
                 <select name="rol">
                     <option value="ADMIN">ADMIN</option>
@@ -32,14 +34,33 @@
                     <option value="false">No</option>
                 </select>
             </label>
-            <button class="btn btn-primary" type="submit">Guardar</button>
+            <div class="form-actions span-2">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <button class="btn btn-muted" type="button" data-reset-form="#form-usuario" hidden>Cancelar edición</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Mi contraseña</h2>
+        <p class="muted">Sesión actual: <strong sec:authentication="name">admin</strong></p>
+        <form th:action="@{/usuarios/password}" method="post" class="form-grid two">
+            <label>Actual <input type="password" name="actual" required autocomplete="current-password"></label>
+            <label>Nueva <input type="password" name="nueva" required minlength="6" autocomplete="new-password"></label>
+            <label class="span-2">Confirmar nueva
+                <input type="password" name="confirmar" required minlength="6" autocomplete="new-password">
+            </label>
+            <div class="form-actions span-2">
+                <button class="btn btn-primary" type="submit">Cambiar mi contraseña</button>
+            </div>
         </form>
     </section>
 
     <section class="card">
         <h2>Registrados</h2>
+        <input class="table-search" data-table="#tabla-usuarios" placeholder="Buscar usuario, rol o empleado">
         <div class="table-wrap">
-            <table>
+            <table id="tabla-usuarios">
                 <thead>
                 <tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Empleado</th><th>Activo</th><th></th></tr>
                 </thead>
@@ -51,10 +72,20 @@
                     <td th:text="${u.empleadoNombre} ?: '—'"></td>
                     <td th:text="${u.activo} ? 'Sí' : 'No'"></td>
                     <td>
-                        <form th:action="@{/usuarios/borrar}" method="post">
-                            <input type="hidden" name="id" th:value="${u.id}">
-                            <button class="btn btn-danger" type="submit">Borrar</button>
-                        </form>
+                        <div class="row-actions">
+                            <button type="button" class="btn btn-accent"
+                                    data-edit="#form-usuario"
+                                    th:attr="data-id=${u.id},
+                                             data-username=${u.username},
+                                             data-rol=${u.rol},
+                                             data-empleadoid=${u.empleadoId != null ? u.empleadoId : ''},
+                                             data-activo=${u.activo}">Editar</button>
+                            <form th:action="@{/usuarios/borrar}" method="post"
+                                  th:data-confirm="|¿Seguro que desea borrar a ${u.username}?|">
+                                <input type="hidden" name="id" th:value="${u.id}">
+                                <button class="btn btn-danger" type="submit">Borrar</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

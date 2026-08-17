@@ -114,4 +114,36 @@ public class UsuariosController {
         }
         return "redirect:/usuarios";
     }
+
+    @PostMapping("/password")
+    public String cambiarPassword(@RequestParam String actual,
+                                  @RequestParam String nueva,
+                                  @RequestParam String confirmar,
+                                  Authentication auth,
+                                  RedirectAttributes ra) {
+        try {
+            if (auth == null) {
+                throw new IllegalArgumentException("No hay sesión.");
+            }
+            if (nueva == null || nueva.length() < 6) {
+                throw new IllegalArgumentException("La nueva contraseña debe tener al menos 6 caracteres.");
+            }
+            if (!nueva.equals(confirmar)) {
+                throw new IllegalArgumentException("La confirmación no coincide.");
+            }
+            Usuario u = usuarioDAO.buscarPorUsername(auth.getName());
+            if (u == null) {
+                throw new IllegalArgumentException("Usuario no encontrado.");
+            }
+            if (!encoder.matches(actual, u.getPasswordHash())) {
+                throw new IllegalArgumentException("La contraseña actual no es correcta.");
+            }
+            u.setPasswordHash(encoder.encode(nueva));
+            usuarioDAO.actualizar(u);
+            ra.addFlashAttribute("mensaje", "Contraseña actualizada.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/usuarios";
+    }
 }

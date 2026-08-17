@@ -9,13 +9,16 @@
 
     <div class="grid-2">
         <section class="card">
-            <h2>Registrar</h2>
-            <form th:action="@{/herramientas/registrar}" method="post" class="form-grid">
-                <label>ID para editar <input name="id" type="number" placeholder="vacío = nuevo"></label>
+            <h2 data-form-title data-new-label="Registrar" data-edit-label="Editar herramienta">Registrar</h2>
+            <form id="form-herramienta" th:action="@{/herramientas/registrar}" method="post" class="form-grid">
+                <input type="hidden" name="id">
                 <label>Código <input name="codigo" required placeholder="HER-016"></label>
                 <label>Nombre <input name="nombre" required></label>
                 <label>Tipo <input name="tipo" required placeholder="TALADRO"></label>
-                <button class="btn btn-primary" type="submit">Guardar herramienta</button>
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Guardar herramienta</button>
+                    <button class="btn btn-muted" type="button" data-reset-form="#form-herramienta" hidden>Cancelar edición</button>
+                </div>
             </form>
         </section>
         <section class="card">
@@ -53,8 +56,9 @@
 
     <section class="card">
         <h2>Inventario</h2>
+        <input class="table-search" data-table="#tabla-herramientas" placeholder="Buscar por código, nombre o responsable">
         <div class="table-wrap">
-            <table>
+            <table id="tabla-herramientas">
                 <thead>
                 <tr><th>ID</th><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Responsable</th><th></th></tr>
                 </thead>
@@ -67,10 +71,16 @@
                     <td><span th:class="${h.estado=='ASIGNADA'} ? 'badge busy' : 'badge ok'" th:text="${h.estado}"></span></td>
                     <td th:text="${h.empleadoNombre} ?: '—'"></td>
                     <td>
-                        <form th:action="@{/herramientas/borrar}" method="post">
-                            <input type="hidden" name="id" th:value="${h.id}">
-                            <button class="btn btn-danger" type="submit">Borrar</button>
-                        </form>
+                        <div class="row-actions">
+                            <button type="button" class="btn btn-accent"
+                                    data-edit="#form-herramienta"
+                                    th:attr="data-id=${h.id}, data-codigo=${h.codigo}, data-nombre=${h.nombre}, data-tipo=${h.tipo}">Editar</button>
+                            <form th:action="@{/herramientas/borrar}" method="post"
+                                  th:data-confirm="|¿Seguro que desea borrar ${h.codigo}?|">
+                                <input type="hidden" name="id" th:value="${h.id}">
+                                <button class="btn btn-danger" type="submit">Borrar</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

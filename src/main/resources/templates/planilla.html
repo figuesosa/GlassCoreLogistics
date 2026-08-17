@@ -10,9 +10,9 @@
 
     <div class="grid-2">
         <section class="card">
-            <h2>Registrar empleado</h2>
-            <form th:action="@{/planilla/empleado}" method="post" class="form-grid">
-                <label>ID para actualizar <input name="id" type="number" placeholder="vacío = nuevo"></label>
+            <h2 data-form-title data-new-label="Registrar empleado" data-edit-label="Editar empleado">Registrar empleado</h2>
+            <form id="form-empleado" th:action="@{/planilla/empleado}" method="post" class="form-grid two">
+                <input type="hidden" name="id">
                 <label>Nombre <input name="nombre" required></label>
                 <label>Apellido <input name="apellido" required></label>
                 <label>Cargo
@@ -22,7 +22,10 @@
                 </label>
                 <label>Salario base <input name="salarioBase" required></label>
                 <label>Teléfono <input name="telefono"></label>
-                <button class="btn btn-primary" type="submit">Guardar empleado</button>
+                <div class="form-actions span-2">
+                    <button class="btn btn-primary" type="submit">Guardar empleado</button>
+                    <button class="btn btn-muted" type="button" data-reset-form="#form-empleado" hidden>Cancelar edición</button>
+                </div>
             </form>
         </section>
         <section class="card">
@@ -52,8 +55,9 @@
 
     <section class="card">
         <h2>Personal</h2>
+        <input class="table-search" data-table="#tabla-empleados" placeholder="Buscar por nombre, cargo o teléfono">
         <div class="table-wrap">
-            <table>
+            <table id="tabla-empleados">
                 <thead>
                 <tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Cargo</th><th>Salario</th><th>Teléfono</th><th></th></tr>
                 </thead>
@@ -66,10 +70,21 @@
                     <td th:text="${#numbers.formatDecimal(e.salarioBase,1,2)}"></td>
                     <td th:text="${e.telefono}"></td>
                     <td>
-                        <form th:action="@{/planilla/empleado/borrar}" method="post">
-                            <input type="hidden" name="id" th:value="${e.id}">
-                            <button class="btn btn-danger" type="submit">Desactivar</button>
-                        </form>
+                        <div class="row-actions">
+                            <button type="button" class="btn btn-accent"
+                                    data-edit="#form-empleado"
+                                    th:attr="data-id=${e.id},
+                                             data-nombre=${e.nombre},
+                                             data-apellido=${e.apellido},
+                                             data-cargo=${e.cargo},
+                                             data-salariobase=${e.salarioBase},
+                                             data-telefono=${e.telefono}">Editar</button>
+                            <form th:action="@{/planilla/empleado/borrar}" method="post"
+                                  th:data-confirm="|¿Seguro que desea desactivar a ${e.nombreCompleto}?|">
+                                <input type="hidden" name="id" th:value="${e.id}">
+                                <button class="btn btn-danger" type="submit">Desactivar</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
@@ -79,8 +94,9 @@
 
     <section class="card">
         <h2>Histórico de planilla</h2>
+        <input class="table-search" data-table="#tabla-planillas" placeholder="Buscar por empleado o fecha">
         <div class="table-wrap">
-            <table>
+            <table id="tabla-planillas">
                 <thead>
                 <tr><th>ID</th><th>Empleado</th><th>Salario</th><th>Extras</th><th>Viáticos</th><th>Neto</th><th>Fecha</th></tr>
                 </thead>

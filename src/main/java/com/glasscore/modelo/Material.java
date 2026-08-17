@@ -64,4 +64,17 @@ public class Material {
     public String toString() {
         return nombre + " (" + stock + " " + unidad + ")";
     }
+
+    public boolean isStockBajo() {
+        if ("VIDRIO".equals(tipo)) {
+            return stock < 10;
+        }
+        if ("ALUMINIO".equals(tipo)) {
+            return stock < 50;
+        }
+        if ("METAL".equals(tipo)) {
+            return stock < 40;
+        }
+        return false;
+    }
 }

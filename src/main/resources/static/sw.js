@@ -1,4 +1,4 @@
-const CACHE = 'glasscore-shell-v1';
+const CACHE = 'glasscore-shell-v2';
 const ASSETS = [
   '/css/app.css',
   '/js/app.js',

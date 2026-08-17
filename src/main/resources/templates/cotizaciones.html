@@ -11,7 +11,7 @@
     <div class="grid-2">
         <section class="card">
             <h2>Nueva cotización</h2>
-            <form th:action="@{/cotizaciones/guardar}" method="post" class="form-grid">
+            <form th:action="@{/cotizaciones/guardar}" method="post" class="form-grid two">
                 <label>Cliente <input name="cliente" required></label>
                 <label>Estructura
                     <select name="tipoEstructura">
@@ -20,15 +20,18 @@
                         <option>BALCON</option>
                     </select>
                 </label>
-                <label>Ancho (m) <input name="ancho" required value="8"></label>
-                <label>Alto (m) <input name="alto" required value="4"></label>
-                <button class="btn btn-primary" type="submit">Calcular y guardar</button>
+                <label>Ancho (m) <input name="ancho" required value="8" inputmode="decimal"></label>
+                <label>Alto (m) <input name="alto" required value="4" inputmode="decimal"></label>
+                <div class="form-actions span-2">
+                    <button class="btn btn-primary" type="submit">Calcular y guardar</button>
+                </div>
             </form>
         </section>
         <section class="card">
             <h2>Stock bodega</h2>
+            <input class="table-search" data-table="#tabla-stock" placeholder="Buscar material">
             <div class="table-wrap">
-                <table>
+                <table id="tabla-stock">
                     <thead>
                     <tr><th>Material</th><th>Tipo</th><th>Unidad</th><th>Stock</th><th>Precio Lps</th></tr>
                     </thead>
@@ -48,8 +51,9 @@
 
     <section class="card">
         <h2>Historial</h2>
+        <input class="table-search" data-table="#tabla-cotizaciones" placeholder="Buscar por cliente o tipo">
         <div class="table-wrap">
-            <table>
+            <table id="tabla-cotizaciones">
                 <thead>
                 <tr>
                     <th>ID</th><th>Cliente</th><th>Tipo</th><th>Ancho</th><th>Alto</th>

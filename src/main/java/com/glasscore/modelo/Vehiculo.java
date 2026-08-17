@@ -73,4 +73,12 @@ public class Vehiculo {
     public String toString() {
         return placa + " - " + marca;
     }
+
+    public int getKmRestantes() {
+        return kmLimiteMantenimiento - kmActual;
+    }
+
+    public boolean isCercaMantenimiento() {
+        return getKmRestantes() <= 2000;
+    }
 }

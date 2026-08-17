@@ -2,6 +2,7 @@ package com.glasscore.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,22 +21,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/auth"))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/login",
+                        "/auth",
                         "/css/**",
                         "/js/**",
                         "/img/**",
                         "/icons/**",
+                        "/favicon.ico",
                         "/manifest.json",
                         "/sw.js",
                         "/offline.html"
                 ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                 .requestMatchers("/planilla/**", "/reportes/planilla/**", "/usuarios/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
+                .loginProcessingUrl("/auth")
+                .failureUrl("/login?error")
                 .defaultSuccessUrl("/", true)
                 .permitAll()
             )
@@ -43,7 +50,8 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
-            .exceptionHandling(ex -> ex.accessDeniedPage("/403"));
+            .exceptionHandling(ex -> ex.accessDeniedHandler((request, response, denied) ->
+                    response.sendRedirect(request.getContextPath() + "/403")));
         return http.build();
     }
 }

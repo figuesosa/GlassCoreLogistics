@@ -16,7 +16,7 @@
     <p class="muted">Vidriería industrial</p>
     <div th:if="${error}" class="flash err" th:text="${error}"></div>
     <div th:if="${mensaje}" class="flash ok" th:text="${mensaje}"></div>
-    <form th:action="@{/login}" method="post">
+    <form th:action="@{/auth}" method="post">
         <label>Usuario
             <input type="text" name="username" autocomplete="username" required autofocus>
         </label>

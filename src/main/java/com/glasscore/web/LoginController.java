@@ -25,4 +25,9 @@ public class LoginController {
     public String forbidden() {
         return "error/403";
     }
+
+    @GetMapping("/favicon.ico")
+    public String favicon() {
+        return "redirect:/img/logo.svg";
+    }
 }

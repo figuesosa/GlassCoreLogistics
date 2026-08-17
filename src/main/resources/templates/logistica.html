@@ -68,7 +68,7 @@
         <h2>Autorizar salida A → B</h2>
         <p th:if="${calc}">
             Cálculo:
-            <strong th:text="${origen} + ' → ' + ${destino}"></strong> ·
+            <strong th:text="|${origen} → ${destino}|"></strong> ·
             <strong th:text="${calc.kilometros} + ' km'"></strong> ·
             <span th:text="${#numbers.formatDecimal(calc.litros,1,3)} + ' L'"></span> ·
             <span th:text="'Lps ' + ${#numbers.formatDecimal(calc.gastoLps,1,2)}"></span>

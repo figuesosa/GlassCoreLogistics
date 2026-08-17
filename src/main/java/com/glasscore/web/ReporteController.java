@@ -33,10 +33,23 @@ public class ReporteController {
         int year = anio == null ? LocalDate.now().getYear() : anio;
         int month = mes == null ? LocalDate.now().getMonthValue() : mes;
         int trim = trimestre == null ? ((LocalDate.now().getMonthValue() - 1) / 3) + 1 : trimestre;
+        model.addAttribute("ventas", java.util.List.of());
+        model.addAttribute("planillas", java.util.List.of());
+        model.addAttribute("kpiCantidad", 0);
+        model.addAttribute("kpiFacturado", 0.0);
+        model.addAttribute("kpiIsv", 0.0);
+        model.addAttribute("kpiMargen", 0.0);
+        model.addAttribute("porProducto", java.util.Map.of());
         try {
             List<Venta> ventas = ventaServicio.listarPeriodo(frecuencia, year, month, trim);
+            java.util.Map<String, Object> resumen = ventaServicio.resumenEjecutivo(ventas);
             model.addAttribute("ventas", ventas);
-            model.addAttribute("resumen", ventaServicio.resumenEjecutivo(ventas));
+            model.addAttribute("resumen", resumen);
+            model.addAttribute("kpiCantidad", resumen.get("cantidad"));
+            model.addAttribute("kpiFacturado", resumen.get("facturado"));
+            model.addAttribute("kpiIsv", resumen.get("isv"));
+            model.addAttribute("kpiMargen", resumen.get("margen"));
+            model.addAttribute("porProducto", resumen.get("porProducto"));
             model.addAttribute("planillas", planillaServicio.listarHistorico());
         } catch (Exception ex) {
             model.addAttribute("error", ex.getMessage());

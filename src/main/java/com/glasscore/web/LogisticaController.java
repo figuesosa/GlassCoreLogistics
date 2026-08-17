@@ -34,6 +34,9 @@ public class LogisticaController {
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("calc", logisticaServicio.calcularRuta(false));
         }
+        model.addAttribute("vehiculos", java.util.List.of());
+        model.addAttribute("choferes", java.util.List.of());
+        model.addAttribute("viajes", java.util.List.of());
         try {
             model.addAttribute("vehiculos", vehiculoDAO.listarTodos());
             model.addAttribute("choferes", empleadoDAO.listarPorCargo("CHOFER"));

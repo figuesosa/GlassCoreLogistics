@@ -130,8 +130,8 @@
                     <td th:text="${#numbers.formatDecimal(p.salarioBase,1,2)}"></td>
                     <td th:text="${#numbers.formatDecimal(p.horasExtras,1,2)}"></td>
                     <td th:text="${#numbers.formatDecimal(p.viaticos,1,2)}"></td>
-                    <td th:text="${p.aplica14vo} ? ${#numbers.formatDecimal(p.monto14vo,1,2)} : '—'"></td>
-                    <td th:text="${p.aplicaAguinaldo} ? ${#numbers.formatDecimal(p.montoAguinaldo,1,2)} : '—'"></td>
+                    <td th:text="${p.aplica14vo ? #numbers.formatDecimal(p.monto14vo,1,2) : '—'}"></td>
+                    <td th:text="${p.aplicaAguinaldo ? #numbers.formatDecimal(p.montoAguinaldo,1,2) : '—'}"></td>
                     <td th:text="${#numbers.formatDecimal(p.deducciones,1,2)}"></td>
                     <td th:text="${#numbers.formatDecimal(p.totalNeto,1,2)}"></td>
                     <td th:text="${p.fechaPago}"></td>

@@ -29,21 +29,21 @@
         </form>
     </section>
 
-    <div class="kpis" th:if="${resumen}">
-        <div class="kpi"><span>Facturas</span><strong th:text="${resumen.cantidad}">0</strong></div>
-        <div class="kpi"><span>Facturación</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(resumen.facturado,1,2)}">0</strong></div>
-        <div class="kpi"><span>ISV 15%</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(resumen.isv,1,2)}">0</strong></div>
-        <div class="kpi"><span>Base / margen</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(resumen.margen,1,2)}">0</strong></div>
+    <div class="kpis">
+        <div class="kpi"><span>Facturas</span><strong th:text="${kpiCantidad ?: 0}">0</strong></div>
+        <div class="kpi"><span>Facturación</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(kpiFacturado ?: 0,1,2)}">0</strong></div>
+        <div class="kpi"><span>ISV 15%</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(kpiIsv ?: 0,1,2)}">0</strong></div>
+        <div class="kpi"><span>Base / margen</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(kpiMargen ?: 0,1,2)}">0</strong></div>
     </div>
 
-    <section class="card" th:if="${resumen}">
+    <section class="card">
         <h2>Vista ejecutiva — productos más cotizados / vendidos</h2>
         <ul class="alert-list">
-            <li th:each="e : ${resumen.porProducto}">
+            <li th:each="e : ${porProducto}">
                 <strong th:text="${e.key}">VENTANA</strong>
-                <span class="badge ok" th:text="${e.value} + ' operaciones'"></span>
+                <span class="badge ok" th:text="|${e.value} operaciones|"></span>
             </li>
-            <li th:if="${resumen.porProducto == null or resumen.porProducto.isEmpty()}" class="muted">Sin ventas en el período.</li>
+            <li th:if="${porProducto == null or porProducto.isEmpty()}" class="muted">Sin ventas en el período.</li>
         </ul>
     </section>
 
@@ -85,8 +85,8 @@
                     <td th:text="${p.id}"></td>
                     <td th:text="${p.empleadoNombre}"></td>
                     <td th:text="${#numbers.formatDecimal(p.totalNeto,1,2)}"></td>
-                    <td th:text="${p.aplica14vo} ? ${#numbers.formatDecimal(p.monto14vo,1,2)} : '—'"></td>
-                    <td th:text="${p.aplicaAguinaldo} ? ${#numbers.formatDecimal(p.montoAguinaldo,1,2)} : '—'"></td>
+                    <td th:text="${p.aplica14vo ? #numbers.formatDecimal(p.monto14vo,1,2) : '—'}"></td>
+                    <td th:text="${p.aplicaAguinaldo ? #numbers.formatDecimal(p.montoAguinaldo,1,2) : '—'}"></td>
                     <td th:text="${p.fechaPago}"></td>
                 </tr>
                 </tbody>

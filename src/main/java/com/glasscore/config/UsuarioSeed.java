@@ -4,10 +4,12 @@ import com.glasscore.dao.UsuarioDAO;
 import com.glasscore.dao.impl.UsuarioDAOImpl;
 import com.glasscore.modelo.Usuario;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@DependsOn("schemaBootstrap")
 public class UsuarioSeed {
 
     private final PasswordEncoder encoder;

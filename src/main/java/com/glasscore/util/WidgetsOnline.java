@@ -1,19 +1,28 @@
 package com.glasscore.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class WidgetsOnline {
 
+    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final Duration TTL = Duration.ofMinutes(10);
     private static final HttpClient CLIENT = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
+            .followRedirects(HttpClient.Redirect.NORMAL)
             .connectTimeout(Duration.ofSeconds(8))
             .build();
+
+    private static volatile ClimaInfo climaCache;
+    private static volatile long climaCacheAt;
+    private static volatile DivisaInfo divisaCache;
+    private static volatile long divisaCacheAt;
 
     private WidgetsOnline() {
     }
@@ -86,33 +95,90 @@ public final class WidgetsOnline {
     }
 
     public static ClimaInfo obtenerClimaTegucigalpa() throws Exception {
+        long now = System.currentTimeMillis();
+        if (climaCache != null && now - climaCacheAt < TTL.toMillis()) {
+            return climaCache;
+        }
+        try {
+            climaCache = climaOpenMeteo();
+            climaCacheAt = now;
+            return climaCache;
+        } catch (Exception primario) {
+            try {
+                climaCache = climaWttr();
+                climaCacheAt = now;
+                return climaCache;
+            } catch (Exception ignored) {
+                if (climaCache != null) {
+                    return climaCache;
+                }
+                throw primario;
+            }
+        }
+    }
+
+    public static DivisaInfo obtenerDivisas() throws Exception {
+        long now = System.currentTimeMillis();
+        if (divisaCache != null && now - divisaCacheAt < TTL.toMillis()) {
+            return divisaCache;
+        }
+        String body = get("https://open.er-api.com/v6/latest/USD");
+        JsonNode root = JSON.readTree(body);
+        JsonNode rates = root.path("rates");
+        if (rates.isMissingNode()) {
+            throw new IllegalStateException("Respuesta de divisas incompleta");
+        }
+        String fecha = root.path("time_last_update_utc").asText("ahora");
+        divisaCache = new DivisaInfo(
+                rates.path("HNL").asDouble(),
+                rates.path("EUR").asDouble(),
+                rates.path("GTQ").asDouble(),
+                fecha);
+        divisaCacheAt = now;
+        return divisaCache;
+    }
+
+    private static ClimaInfo climaOpenMeteo() throws Exception {
         String url = "https://api.open-meteo.com/v1/forecast"
                 + "?latitude=14.0723&longitude=-87.1921"
                 + "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m"
                 + "&timezone=America%2FTegucigalpa&wind_speed_unit=kmh";
-        String json = get(url);
-        double temp = num(json, "temperature_2m");
-        int humedad = (int) Math.round(num(json, "relative_humidity_2m"));
-        int code = (int) Math.round(num(json, "weather_code"));
-        double viento = num(json, "wind_speed_10m");
-        return new ClimaInfo("Tegucigalpa, Honduras", describirClima(code), temp, humedad, viento);
+        JsonNode current = JSON.readTree(get(url)).path("current");
+        if (current.isMissingNode() || current.path("temperature_2m").isMissingNode()) {
+            throw new IllegalStateException("Open-Meteo sin datos current");
+        }
+        int code = current.path("weather_code").asInt();
+        return new ClimaInfo(
+                "Tegucigalpa, Honduras",
+                describirClima(code),
+                current.path("temperature_2m").asDouble(),
+                current.path("relative_humidity_2m").asInt(),
+                current.path("wind_speed_10m").asDouble());
     }
 
-    public static DivisaInfo obtenerDivisas() throws Exception {
-        String json = get("https://open.er-api.com/v6/latest/USD");
-        double hnl = numAnidado(json, "HNL");
-        double eur = numAnidado(json, "EUR");
-        double gtq = numAnidado(json, "GTQ");
-        String fecha = texto(json, "time_last_update_utc");
-        if (fecha.isEmpty()) {
-            fecha = "ahora";
+    private static ClimaInfo climaWttr() throws Exception {
+        JsonNode cur = JSON.readTree(get("https://wttr.in/Tegucigalpa?format=j1"))
+                .path("current_condition");
+        if (!cur.isArray() || cur.isEmpty()) {
+            throw new IllegalStateException("wttr.in sin datos");
         }
-        return new DivisaInfo(hnl, eur, gtq, fecha);
+        JsonNode now = cur.get(0);
+        String condicion = now.path("weatherDesc").isArray() && !now.path("weatherDesc").isEmpty()
+                ? now.path("weatherDesc").get(0).path("value").asText("Variable")
+                : "Variable";
+        return new ClimaInfo(
+                "Tegucigalpa, Honduras",
+                condicion,
+                now.path("temp_C").asDouble(),
+                now.path("humidity").asInt(),
+                now.path("windspeedKmph").asDouble());
     }
 
     private static String get(String url) throws Exception {
         HttpRequest req = HttpRequest.newBuilder(URI.create(url))
                 .timeout(Duration.ofSeconds(12))
+                .header("User-Agent", "GlassCoreLogistics/1.0 (student demo)")
+                .header("Accept", "application/json")
                 .GET()
                 .build();
         HttpResponse<String> res = CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
@@ -120,25 +186,6 @@ public final class WidgetsOnline {
             throw new IllegalStateException("HTTP " + res.statusCode());
         }
         return res.body();
-    }
-
-    private static double num(String json, String key) {
-        Matcher m = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*(-?\\d+(?:\\.\\d+)?)")
-                .matcher(json);
-        if (!m.find()) {
-            throw new IllegalStateException("No se encontró " + key);
-        }
-        return Double.parseDouble(m.group(1));
-    }
-
-    private static double numAnidado(String json, String key) {
-        return num(json, key);
-    }
-
-    private static String texto(String json, String key) {
-        Matcher m = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*\"([^\"]*)\"")
-                .matcher(json);
-        return m.find() ? m.group(1) : "";
     }
 
     public static String describirClima(int code) {

@@ -5,6 +5,7 @@ import com.glasscore.dao.impl.VehiculoDAOImpl;
 import com.glasscore.modelo.Vehiculo;
 import com.glasscore.modelo.Viaje;
 import com.glasscore.servicio.LogisticaServicio;
+import com.glasscore.util.RutaCatalogo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +24,16 @@ public class LogisticaController {
 
     @GetMapping
     public String pagina(@RequestParam(value = "redondo", required = false) Boolean redondo,
+                         @RequestParam(defaultValue = "Tegucigalpa") String origen,
+                         @RequestParam(defaultValue = "Comayagua") String destino,
                          Model model) {
         boolean esRedondo = Boolean.TRUE.equals(redondo);
-        LogisticaServicio.ResultadoCalculo calc = logisticaServicio.calcularRuta(esRedondo);
+        try {
+            model.addAttribute("calc", logisticaServicio.calcularRuta(origen, destino, esRedondo));
+        } catch (Exception ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("calc", logisticaServicio.calcularRuta(false));
+        }
         try {
             model.addAttribute("vehiculos", vehiculoDAO.listarTodos());
             model.addAttribute("choferes", empleadoDAO.listarPorCargo("CHOFER"));
@@ -34,7 +42,9 @@ public class LogisticaController {
             model.addAttribute("error", ex.getMessage());
         }
         model.addAttribute("redondo", esRedondo);
-        model.addAttribute("calc", calc);
+        model.addAttribute("origen", origen);
+        model.addAttribute("destino", destino);
+        model.addAttribute("ciudades", RutaCatalogo.ciudades());
         return "logistica";
     }
 
@@ -86,11 +96,15 @@ public class LogisticaController {
     @PostMapping("/autorizar")
     public String autorizar(@RequestParam int vehiculoId,
                             @RequestParam(required = false) Boolean redondo,
+                            @RequestParam(defaultValue = "Tegucigalpa") String origen,
+                            @RequestParam(defaultValue = "Comayagua") String destino,
                             RedirectAttributes ra) {
         try {
-            Viaje viaje = logisticaServicio.autorizarYRegistrarViaje(vehiculoId, Boolean.TRUE.equals(redondo));
+            Viaje viaje = logisticaServicio.autorizarYRegistrarViaje(
+                    vehiculoId, origen, destino, Boolean.TRUE.equals(redondo));
             ra.addFlashAttribute("mensaje",
                     "Salida autorizada. Viaje #" + viaje.getId()
+                    + " | " + viaje.getRuta()
                     + " | Gasto Lps " + String.format("%.2f", viaje.getGastoCombustible())
                     + " | Custodia: " + viaje.getHerramientasCustodia());
         } catch (LogisticaServicio.MantenimientoRequeridoException ex) {
@@ -98,6 +112,8 @@ public class LogisticaController {
         } catch (Exception ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }
-        return "redirect:/logistica" + (Boolean.TRUE.equals(redondo) ? "?redondo=true" : "");
+        String q = "?origen=" + origen + "&destino=" + destino
+                + (Boolean.TRUE.equals(redondo) ? "&redondo=true" : "");
+        return "redirect:/logistica" + q;
     }
 }

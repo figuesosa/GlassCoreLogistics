@@ -146,6 +146,10 @@ td { padding: 0.35rem 0.5rem; border-bottom: 1px solid #ccc; }
 .big { font-size: 1.9rem; margin: 0.15rem 0; color: var(--blue); font-family: Cambria, Georgia, serif; }
 .rates { list-style: none; padding: 0; margin: 0; }
 .rates li { display: flex; justify-content: space-between; padding: 0.28rem 0; border-bottom: 1px solid #eee; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.55rem; margin-bottom: 0.85rem; }
+.kpi { background: #fff; border: 1px solid var(--gray); padding: 0.7rem 0.8rem; }
+.kpi span { display: block; color: #555; font-size: 0.8rem; }
+.kpi strong { display: block; margin-top: 0.25rem; color: var(--blue); font-size: 1.15rem; font-family: Cambria, Georgia, serif; }
 .modulos { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.55rem; }
 .mod {
   background: #f0f0f0;

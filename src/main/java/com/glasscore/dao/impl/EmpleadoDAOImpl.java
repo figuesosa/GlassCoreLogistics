@@ -14,7 +14,8 @@ public class EmpleadoDAOImpl implements EmpleadoDAO {
 
     @Override
     public int insertar(Empleado e) throws Exception {
-        String sql = "INSERT INTO empleado (nombre, apellido, cargo, salario_base, telefono, activo) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO empleado (nombre, apellido, cargo, salario_base, telefono, activo, identidad, fecha_ingreso, vacaciones_gozadas) "
+                + "VALUES (?,?,?,?,?,?,?,?,?)";
         try (Connection cn = ConexionDB.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, e.getNombre());
@@ -23,6 +24,13 @@ public class EmpleadoDAOImpl implements EmpleadoDAO {
             ps.setDouble(4, e.getSalarioBase());
             ps.setString(5, e.getTelefono());
             ps.setBoolean(6, e.isActivo());
+            ps.setString(7, e.getIdentidad());
+            if (e.getFechaIngreso() != null) {
+                ps.setDate(8, java.sql.Date.valueOf(e.getFechaIngreso()));
+            } else {
+                ps.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
+            }
+            ps.setInt(9, e.getVacacionesGozadas());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -35,7 +43,8 @@ public class EmpleadoDAOImpl implements EmpleadoDAO {
 
     @Override
     public boolean actualizar(Empleado e) throws Exception {
-        String sql = "UPDATE empleado SET nombre=?, apellido=?, cargo=?, salario_base=?, telefono=?, activo=? WHERE id=?";
+        String sql = "UPDATE empleado SET nombre=?, apellido=?, cargo=?, salario_base=?, telefono=?, activo=?, "
+                + "identidad=?, fecha_ingreso=?, vacaciones_gozadas=? WHERE id=?";
         try (Connection cn = ConexionDB.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, e.getNombre());
@@ -44,7 +53,14 @@ public class EmpleadoDAOImpl implements EmpleadoDAO {
             ps.setDouble(4, e.getSalarioBase());
             ps.setString(5, e.getTelefono());
             ps.setBoolean(6, e.isActivo());
-            ps.setInt(7, e.getId());
+            ps.setString(7, e.getIdentidad());
+            if (e.getFechaIngreso() != null) {
+                ps.setDate(8, java.sql.Date.valueOf(e.getFechaIngreso()));
+            } else {
+                ps.setNull(8, java.sql.Types.DATE);
+            }
+            ps.setInt(9, e.getVacacionesGozadas());
+            ps.setInt(10, e.getId());
             return ps.executeUpdate() > 0;
         }
     }
@@ -104,6 +120,17 @@ public class EmpleadoDAOImpl implements EmpleadoDAO {
         return lista;
     }
 
+    @Override
+    public Empleado buscarPorIdentidad(String identidad) throws Exception {
+        try (Connection cn = ConexionDB.getConnection();
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM empleado WHERE identidad=?")) {
+            ps.setString(1, identidad);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? map(rs) : null;
+            }
+        }
+    }
+
     private Empleado map(ResultSet rs) throws Exception {
         Empleado e = new Empleado();
         e.setId(rs.getInt("id"));
@@ -113,6 +140,16 @@ public class EmpleadoDAOImpl implements EmpleadoDAO {
         e.setSalarioBase(rs.getDouble("salario_base"));
         e.setTelefono(rs.getString("telefono"));
         e.setActivo(rs.getBoolean("activo"));
+        try {
+            e.setIdentidad(rs.getString("identidad"));
+            java.sql.Date ing = rs.getDate("fecha_ingreso");
+            if (ing != null) {
+                e.setFechaIngreso(ing.toLocalDate());
+            }
+            e.setVacacionesGozadas(rs.getInt("vacaciones_gozadas"));
+        } catch (Exception ignored) {
+            // columnas nuevas aún no presentes
+        }
         return e;
     }
 }

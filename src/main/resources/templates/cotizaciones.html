@@ -6,19 +6,30 @@
 <main class="page">
     <div th:replace="~{fragments :: flashes}"></div>
     <h1 class="page-title">Cotizaciones</h1>
-    <p class="lead">Vidrio en bodega: <strong th:text="${#numbers.formatDecimal(stockVidrio,1,3)} + ' m²'"></strong>. Si el área pasa el stock, sale alerta de compra y la cotización se guarda igual.</p>
+    <p class="lead">Vidrio en bodega: <strong th:text="${#numbers.formatDecimal(stockVidrio,1,3)} + ' m²'"></strong>.
+        Si falta material sale alerta de compra y la cotización se guarda igual. ISV 15%. Vigencia de 2 a 15 días hábiles
+        (base <span th:text="${diasDefault}">5</span>).</p>
 
     <div class="grid-2">
         <section class="card">
             <h2>Nueva cotización</h2>
             <form th:action="@{/cotizaciones/guardar}" method="post" class="form-grid two">
-                <label>Cliente <input name="cliente" required></label>
+                <label>Cliente registrado
+                    <select name="clienteId">
+                        <option value="">— o escriba el nombre —</option>
+                        <option th:each="cl : ${clientes}" th:value="${cl.id}" th:text="${cl.nombre}"></option>
+                    </select>
+                </label>
+                <label>Nombre (si no está en catálogo) <input name="cliente"></label>
                 <label>Estructura
                     <select name="tipoEstructura">
                         <option>VENTANA</option>
                         <option>PUERTA</option>
                         <option>BALCON</option>
                     </select>
+                </label>
+                <label>Vigencia (días hábiles)
+                    <input type="number" name="vigenciaDias" min="2" max="15" th:value="${diasDefault}">
                 </label>
                 <label>Ancho (m) <input name="ancho" required value="8" inputmode="decimal"></label>
                 <label>Alto (m) <input name="alto" required value="4" inputmode="decimal"></label>
@@ -56,8 +67,8 @@
             <table id="tabla-cotizaciones">
                 <thead>
                 <tr>
-                    <th>ID</th><th>Cliente</th><th>Tipo</th><th>Ancho</th><th>Alto</th>
-                    <th>m²</th><th>ML Alum.</th><th>ML Metal</th><th>Subtotal</th><th>Alerta</th>
+                    <th>Orden</th><th>Cliente</th><th>Tipo</th><th>Ancho</th><th>Alto</th>
+                    <th>m²</th><th>Subtotal</th><th>ISV 15%</th><th>Total</th><th>Vence</th><th>Estado</th><th>Factura</th><th>Alerta</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -68,9 +79,12 @@
                     <td th:text="${#numbers.formatDecimal(c.ancho,1,3)}"></td>
                     <td th:text="${#numbers.formatDecimal(c.alto,1,3)}"></td>
                     <td th:text="${#numbers.formatDecimal(c.areaVidrio,1,3)}"></td>
-                    <td th:text="${#numbers.formatDecimal(c.metrosAluminio,1,3)}"></td>
-                    <td th:text="${#numbers.formatDecimal(c.metrosMetal,1,3)}"></td>
                     <td th:text="${#numbers.formatDecimal(c.subtotal,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.isv,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.total,1,2)}"></td>
+                    <td th:text="${c.fechaVencimiento != null ? #temporals.format(c.fechaVencimiento, 'dd/MM/yyyy') : '—'}"></td>
+                    <td><span class="badge" th:classappend="${c.estadoMostrado=='VIGENTE'} ? ' ok' : ' warn'" th:text="${c.estadoMostrado}"></span></td>
+                    <td th:text="${c.numeroFactura} ?: '—'"></td>
                     <td><span th:if="${c.alertaCompra}" class="badge warn">ALERTA</span><span th:unless="${c.alertaCompra}">—</span></td>
                 </tr>
                 </tbody>

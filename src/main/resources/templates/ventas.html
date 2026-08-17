@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head th:replace="~{fragments :: head('Ventas')}"></head>
+<body>
+<header th:replace="~{fragments :: top('ventas')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Facturación</h1>
+    <p class="lead">Una cotización vigente se convierte en factura: correlativo SAR, CAI, descargo de inventario y estado CONVERTIDA_A_VENTA.</p>
+    <section class="card" sec:authorize="hasAnyRole('ADMIN','CAJERO')">
+        <h2>Convertir orden vigente</h2>
+        <form th:action="@{/ventas/convertir}" method="post" class="form-grid two">
+            <label class="span-2">Número de orden
+                <select name="cotizacionId" required>
+                    <option value="">— seleccione —</option>
+                    <option th:each="c : ${vigentes}" th:value="${c.id}"
+                            th:text="'#' + ${c.id} + ' · ' + ${c.cliente} + ' · Lps ' + ${#numbers.formatDecimal(c.total,1,2)}"></option>
+                </select>
+            </label>
+            <div class="form-actions span-2">
+                <button class="btn btn-danger" type="submit">Convertir a factura</button>
+            </div>
+        </form>
+        <p class="muted" th:if="${vigentes == null or vigentes.isEmpty()}">No hay cotizaciones vigentes para facturar.</p>
+    </section>
+    <section class="card">
+        <h2>Facturas emitidas</h2>
+        <input class="table-search" data-table="#tabla-ventas" placeholder="Buscar factura, CAI o cliente">
+        <div class="table-wrap">
+            <table id="tabla-ventas">
+                <thead>
+                <tr><th>Factura</th><th>Orden</th><th>Cliente</th><th>CAI</th><th>Subtotal</th><th>ISV 15%</th><th>Retención</th><th>Total</th><th>Fecha</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="v : ${ventas}">
+                    <td th:text="${v.numeroFactura}"></td>
+                    <td th:text="${v.cotizacionId}"></td>
+                    <td th:text="${v.cliente}"></td>
+                    <td th:text="${v.cai}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.subtotal,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.isv,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.retencion,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.total,1,2)}"></td>
+                    <td th:text="${v.fecha != null ? #temporals.format(v.fecha, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

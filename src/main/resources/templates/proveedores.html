@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Proveedores')}"></head>
+<body>
+<header th:replace="~{fragments :: top('proveedores')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Proveedores</h1>
+    <p class="lead">RTN único. Varios teléfonos y agentes comerciales por proveedor.</p>
+    <div class="grid-2">
+        <section class="card">
+            <h2>Nuevo proveedor</h2>
+            <form th:action="@{/proveedores/guardar}" method="post" class="form-grid">
+                <label>Nombre <input name="nombre" required></label>
+                <label>RTN <input name="rtn" required></label>
+                <label>Dirección <input name="direccion"></label>
+                <label>Teléfono inicial <input name="telefono"></label>
+                <button class="btn btn-primary" type="submit">Registrar</button>
+            </form>
+        </section>
+        <section class="card">
+            <h2>Agregar teléfono o agente</h2>
+            <form th:action="@{/proveedores/telefono}" method="post" class="form-grid">
+                <label>Proveedor
+                    <select name="proveedorId" required>
+                        <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                    </select>
+                </label>
+                <label>Teléfono <input name="telefono" required></label>
+                <button class="btn btn-accent" type="submit">Agregar teléfono</button>
+            </form>
+            <form th:action="@{/proveedores/contacto}" method="post" class="form-grid" style="margin-top:1rem">
+                <label>Proveedor
+                    <select name="proveedorId" required>
+                        <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                    </select>
+                </label>
+                <label>Agente <input name="nombre" required></label>
+                <label>Cargo <input name="cargo"></label>
+                <label>Teléfono <input name="telefono"></label>
+                <label>Correo <input name="email"></label>
+                <button class="btn btn-accent" type="submit">Asociar agente</button>
+            </form>
+        </section>
+    </div>
+    <section class="card">
+        <h2>Catálogo</h2>
+        <input class="table-search" data-table="#tabla-prov" placeholder="Buscar proveedor o RTN">
+        <div class="table-wrap">
+            <table id="tabla-prov">
+                <thead>
+                <tr><th>ID</th><th>Nombre</th><th>RTN</th><th>Dirección</th><th>Teléfonos</th><th>Agentes</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${proveedores}">
+                    <td th:text="${p.id}"></td>
+                    <td th:text="${p.nombre}"></td>
+                    <td th:text="${p.rtn}"></td>
+                    <td th:text="${p.direccion}"></td>
+                    <td th:text="${p.telefonosResumen} ?: '—'"></td>
+                    <td th:text="${p.contactosResumen} ?: '—'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

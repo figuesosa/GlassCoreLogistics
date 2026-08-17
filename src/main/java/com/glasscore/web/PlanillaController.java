@@ -4,6 +4,7 @@ import com.glasscore.dao.impl.EmpleadoDAOImpl;
 import com.glasscore.modelo.Empleado;
 import com.glasscore.modelo.Planilla;
 import com.glasscore.servicio.PlanillaServicio;
+import com.glasscore.util.DocumentoUnico;
 import java.time.LocalDate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,14 +40,26 @@ public class PlanillaController {
                                   @RequestParam String cargo,
                                   @RequestParam String salarioBase,
                                   @RequestParam(required = false) String telefono,
+                                  @RequestParam String identidad,
+                                  @RequestParam(required = false) String fechaIngreso,
+                                  @RequestParam(defaultValue = "0") int vacacionesGozadas,
                                   RedirectAttributes ra) {
         try {
+            DocumentoUnico.exigir(identidad, "Identidad");
+            Empleado duplicado = empleadoDAO.buscarPorIdentidad(identidad.trim());
+            if (duplicado != null && (id == null || duplicado.getId() != id)) {
+                throw new IllegalArgumentException("Ya existe un empleado con esa identidad.");
+            }
             Empleado e = new Empleado();
             e.setNombre(nombre.trim());
             e.setApellido(apellido.trim());
             e.setCargo(cargo);
             e.setSalarioBase(Double.parseDouble(salarioBase.trim().replace(',', '.')));
             e.setTelefono(telefono == null ? "" : telefono.trim());
+            e.setIdentidad(identidad.trim());
+            e.setFechaIngreso(fechaIngreso == null || fechaIngreso.isBlank()
+                    ? LocalDate.now() : LocalDate.parse(fechaIngreso));
+            e.setVacacionesGozadas(Math.max(0, vacacionesGozadas));
             e.setActivo(true);
             if (e.getNombre().isEmpty() || e.getApellido().isEmpty()) {
                 throw new IllegalArgumentException("Nombre y apellido son obligatorios.");
@@ -82,11 +95,16 @@ public class PlanillaController {
     public String cerrar(@RequestParam int empleadoId,
                          @RequestParam String horasExtras,
                          @RequestParam String viaticos,
+                         @RequestParam(defaultValue = "0") String deducciones,
+                         @RequestParam(defaultValue = "false") boolean aplica14vo,
+                         @RequestParam(defaultValue = "false") boolean aplicaAguinaldo,
                          RedirectAttributes ra) {
         try {
             double extras = Double.parseDouble(horasExtras.trim().replace(',', '.'));
             double via = Double.parseDouble(viaticos.trim().replace(',', '.'));
-            Planilla p = planillaServicio.calcularYRegistrar(empleadoId, extras, via, LocalDate.now());
+            double ded = Double.parseDouble(deducciones.trim().replace(',', '.'));
+            Planilla p = planillaServicio.calcularYRegistrar(
+                    empleadoId, extras, via, ded, aplica14vo, aplicaAguinaldo, LocalDate.now());
             ra.addFlashAttribute("mensaje",
                     "Planilla #" + p.getId() + " cerrada. Neto Lps " + String.format("%.2f", p.getTotalNeto()));
         } catch (NumberFormatException nfe) {

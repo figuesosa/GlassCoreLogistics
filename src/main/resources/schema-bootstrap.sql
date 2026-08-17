@@ -39,6 +39,10 @@ CREATE TABLE cotizacion (
     metros_aluminio   DECIMAL(12,3) NOT NULL,
     metros_metal      DECIMAL(12,3) NOT NULL,
     subtotal          DECIMAL(12,2) NOT NULL,
+    isv               DECIMAL(12,2) NOT NULL DEFAULT 0,
+    total             DECIMAL(12,2) NOT NULL DEFAULT 0,
+    vigencia_dias     INT NOT NULL DEFAULT 15,
+    fecha_vencimiento DATETIME NULL,
     alerta_compra     TEXT NULL,
     fecha             DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -92,7 +96,7 @@ CREATE TABLE usuario (
     id             INT AUTO_INCREMENT PRIMARY KEY,
     username       VARCHAR(50) NOT NULL UNIQUE,
     password_hash  VARCHAR(100) NOT NULL,
-    rol            ENUM('ADMIN','OPERADOR') NOT NULL,
+    rol            ENUM('ADMIN','OPERADOR','CONTADOR','CAJERO') NOT NULL,
     empleado_id    INT NULL,
     activo         TINYINT(1) NOT NULL DEFAULT 1,
     CONSTRAINT fk_usuario_empleado
@@ -141,14 +145,14 @@ INSERT INTO material (nombre, tipo, unidad, stock, precio_unitario) VALUES
 (CONVERT(UNHEX('4D6172636F206D6574C3A16C69636F2067616C76616E697A61646F') USING utf8mb4), 'METAL', 'ML', 50.000, 75.00),
 (CONVERT(UNHEX('4D6172636F206D6574C3A16C69636F206E6567726F') USING utf8mb4), 'METAL', 'ML', 35.000, 90.00);
 
-INSERT INTO cotizacion (cliente, tipo_estructura, ancho, alto, area_vidrio, metros_aluminio, metros_metal, subtotal, alerta_compra, fecha) VALUES
-('Residencial Los Pinos', 'VENTANA', 1.200, 1.500, 1.800, 5.400, 5.400, 2142.00, NULL, '2026-06-10 09:15:00'),
-('Comercial MetroMall', 'PUERTA', 2.100, 2.400, 5.040, 9.000, 9.000, 4693.80, NULL, '2026-06-18 11:40:00'),
-('Hotel Plaza Real', 'BALCON', 3.500, 2.800, 9.800, 12.600, 12.600, 7959.00, NULL, '2026-07-01 14:20:00'),
-('Torre Centro', 'VENTANA', 8.000, 4.000, 32.000, 24.000, 24.000, 21240.00,
+INSERT INTO cotizacion (cliente, tipo_estructura, ancho, alto, area_vidrio, metros_aluminio, metros_metal, subtotal, isv, total, vigencia_dias, fecha_vencimiento, alerta_compra, fecha) VALUES
+('Residencial Los Pinos', 'VENTANA', 1.200, 1.500, 1.800, 5.400, 5.400, 2142.00, 321.30, 2463.30, 15, '2026-06-25 09:15:00', NULL, '2026-06-10 09:15:00'),
+('Comercial MetroMall', 'PUERTA', 2.100, 2.400, 5.040, 9.000, 9.000, 4693.80, 704.07, 5397.87, 15, '2026-07-03 11:40:00', NULL, '2026-06-18 11:40:00'),
+('Hotel Plaza Real', 'BALCON', 3.500, 2.800, 9.800, 12.600, 12.600, 7959.00, 1193.85, 9152.85, 15, '2026-07-16 14:20:00', NULL, '2026-07-01 14:20:00'),
+('Torre Centro', 'VENTANA', 8.000, 4.000, 32.000, 24.000, 24.000, 21240.00, 3186.00, 24426.00, 15, '2026-07-23 16:05:00',
  'ALERTA DE COMPRA REQUERIDA: adquirir 6.000 m2 de vidrio (necesario 32.000, stock 26.000)',
  '2026-07-08 16:05:00'),
-(CONVERT(UNHEX('436CC3AD6E6963612053616E7461204D6172C3AD61') USING utf8mb4), 'PUERTA', 1.800, 2.200, 3.960, 8.000, 8.000, 3702.00, NULL, '2026-07-12 10:30:00');
+(CONVERT(UNHEX('436CC3AD6E6963612053616E7461204D6172C3AD61') USING utf8mb4), 'PUERTA', 1.800, 2.200, 3.960, 8.000, 8.000, 3702.00, 555.30, 4257.30, 15, '2026-08-25 10:30:00', NULL, '2026-08-10 10:30:00');
 
 INSERT INTO planilla (empleado_id, salario_base, horas_extras, viaticos, total_neto, fecha_pago) VALUES
 (1, 12500.00, 800.00, 350.00, 13650.00, '2026-06-15'),

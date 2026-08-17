@@ -10,4 +10,5 @@ public interface EmpleadoDAO {
     Empleado buscarPorId(int id) throws Exception;
     List<Empleado> listarTodos() throws Exception;
     List<Empleado> listarPorCargo(String cargo) throws Exception;
+    Empleado buscarPorIdentidad(String identidad) throws Exception;
 }

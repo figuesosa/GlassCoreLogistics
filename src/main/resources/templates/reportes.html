@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Reportes')}"></head>
+<body>
+<header th:replace="~{fragments :: top('reportes')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Reportería ejecutiva y contable</h1>
+    <p class="lead">Ventas mensuales, trimestrales o anuales. Vista ejecutiva en pantalla y desglose contable (ISV 15%, CAI y correlativos) en PDF Jasper.</p>
+
+    <section class="card">
+        <h2>Período</h2>
+        <form method="get" th:action="@{/reportes}" class="form-grid two">
+            <label>Frecuencia
+                <select name="frecuencia">
+                    <option value="MENSUAL" th:selected="${frecuencia=='MENSUAL'}">Mensual</option>
+                    <option value="TRIMESTRAL" th:selected="${frecuencia=='TRIMESTRAL'}">Trimestral</option>
+                    <option value="ANUAL" th:selected="${frecuencia=='ANUAL'}">Anual</option>
+                </select>
+            </label>
+            <label>Año <input type="number" name="anio" th:value="${anio}" min="2020" max="2100"></label>
+            <label>Mes <input type="number" name="mes" th:value="${mes}" min="1" max="12"></label>
+            <label>Trimestre <input type="number" name="trimestre" th:value="${trimestre}" min="1" max="4"></label>
+            <div class="form-actions span-2">
+                <button class="btn btn-primary" type="submit">Actualizar vista</button>
+                <a class="btn btn-accent" target="_blank"
+                   th:href="@{/reportes/ventas(frecuencia=${frecuencia},anio=${anio},mes=${mes},trimestre=${trimestre})}">PDF contable Jasper</a>
+            </div>
+        </form>
+    </section>
+
+    <div class="kpis" th:if="${resumen}">
+        <div class="kpi"><span>Facturas</span><strong th:text="${resumen.cantidad}">0</strong></div>
+        <div class="kpi"><span>Facturación</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(resumen.facturado,1,2)}">0</strong></div>
+        <div class="kpi"><span>ISV 15%</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(resumen.isv,1,2)}">0</strong></div>
+        <div class="kpi"><span>Base / margen</span><strong th:text="'Lps ' + ${#numbers.formatDecimal(resumen.margen,1,2)}">0</strong></div>
+    </div>
+
+    <section class="card" th:if="${resumen}">
+        <h2>Vista ejecutiva — productos más cotizados / vendidos</h2>
+        <ul class="alert-list">
+            <li th:each="e : ${resumen.porProducto}">
+                <strong th:text="${e.key}">VENTANA</strong>
+                <span class="badge ok" th:text="${e.value} + ' operaciones'"></span>
+            </li>
+            <li th:if="${resumen.porProducto == null or resumen.porProducto.isEmpty()}" class="muted">Sin ventas en el período.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Vista contable</h2>
+        <input class="table-search" data-table="#tabla-rep-ventas" placeholder="Buscar factura, CAI o cliente">
+        <div class="table-wrap">
+            <table id="tabla-rep-ventas">
+                <thead>
+                <tr><th>Factura</th><th>Cliente</th><th>Producto</th><th>CAI</th><th>Subtotal</th><th>ISV</th><th>Retención</th><th>Total</th><th>Fecha</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="v : ${ventas}">
+                    <td th:text="${v.numeroFactura}"></td>
+                    <td th:text="${v.cliente}"></td>
+                    <td th:text="${v.tipoEstructura}"></td>
+                    <td th:text="${v.cai}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.subtotal,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.isv,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.retencion,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(v.total,1,2)}"></td>
+                    <td th:text="${v.fecha != null ? #temporals.format(v.fecha, 'dd/MM/yyyy') : '—'}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Histórico de planillas</h2>
+        <input class="table-search" data-table="#tabla-rep-plan" placeholder="Buscar empleado">
+        <div class="table-wrap">
+            <table id="tabla-rep-plan">
+                <thead>
+                <tr><th>ID</th><th>Empleado</th><th>Neto</th><th>14vo</th><th>Aguinaldo</th><th>Fecha</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${planillas}">
+                    <td th:text="${p.id}"></td>
+                    <td th:text="${p.empleadoNombre}"></td>
+                    <td th:text="${#numbers.formatDecimal(p.totalNeto,1,2)}"></td>
+                    <td th:text="${p.aplica14vo} ? ${#numbers.formatDecimal(p.monto14vo,1,2)} : '—'"></td>
+                    <td th:text="${p.aplicaAguinaldo} ? ${#numbers.formatDecimal(p.montoAguinaldo,1,2)} : '—'"></td>
+                    <td th:text="${p.fechaPago}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

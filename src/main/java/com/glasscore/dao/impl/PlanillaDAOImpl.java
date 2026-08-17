@@ -19,8 +19,9 @@ public class PlanillaDAOImpl implements PlanillaDAO {
 
     @Override
     public int insertar(Planilla p) throws Exception {
-        String sql = "INSERT INTO planilla (empleado_id, salario_base, horas_extras, viaticos, total_neto, fecha_pago) "
-                + "VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO planilla (empleado_id, salario_base, horas_extras, viaticos, total_neto, fecha_pago, "
+                + "aplica_14vo, aplica_aguinaldo, monto_14vo, monto_aguinaldo, deducciones) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection cn = ConexionDB.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, p.getEmpleadoId());
@@ -29,6 +30,11 @@ public class PlanillaDAOImpl implements PlanillaDAO {
             ps.setDouble(4, p.getViaticos());
             ps.setDouble(5, p.getTotalNeto());
             ps.setDate(6, Date.valueOf(p.getFechaPago()));
+            ps.setBoolean(7, p.isAplica14vo());
+            ps.setBoolean(8, p.isAplicaAguinaldo());
+            ps.setDouble(9, p.getMonto14vo());
+            ps.setDouble(10, p.getMontoAguinaldo());
+            ps.setDouble(11, p.getDeducciones());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -96,6 +102,15 @@ public class PlanillaDAOImpl implements PlanillaDAO {
         Date d = rs.getDate("fecha_pago");
         if (d != null) {
             p.setFechaPago(d.toLocalDate());
+        }
+        try {
+            p.setAplica14vo(rs.getBoolean("aplica_14vo"));
+            p.setAplicaAguinaldo(rs.getBoolean("aplica_aguinaldo"));
+            p.setMonto14vo(rs.getDouble("monto_14vo"));
+            p.setMontoAguinaldo(rs.getDouble("monto_aguinaldo"));
+            p.setDeducciones(rs.getDouble("deducciones"));
+        } catch (Exception ignored) {
+            // columnas nuevas
         }
         return p;
     }

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 <head th:replace="~{fragments :: head('Planilla')}"></head>
 <body>
 <header th:replace="~{fragments :: top('planilla')}"></header>
 <main class="page">
     <div th:replace="~{fragments :: flashes}"></div>
-    <h1 class="page-title">Empleados y planilla</h1>
-    <p class="lead">Neto = salario de la base + extras + viáticos. El PDF pide una planilla ya cerrada.</p>
+    <h1 class="page-title">Empleados, vacaciones y planilla</h1>
+    <p class="lead">Neto = salario base + extras + viáticos + 14vo/aguinaldo (si aplica) − deducciones. El 14vo y el aguinaldo se calculan proporcionales a los días laborados del año.</p>
 
-    <div class="grid-2">
+    <div class="grid-2" sec:authorize="hasRole('ADMIN')">
         <section class="card">
             <h2 data-form-title data-new-label="Registrar empleado" data-edit-label="Editar empleado">Registrar empleado</h2>
             <form id="form-empleado" th:action="@{/planilla/empleado}" method="post" class="form-grid two">
                 <input type="hidden" name="id">
                 <label>Nombre <input name="nombre" required></label>
                 <label>Apellido <input name="apellido" required></label>
+                <label>Identidad <input name="identidad" required></label>
+                <label>Fecha de ingreso <input type="date" name="fechaIngreso" required></label>
                 <label>Cargo
                     <select name="cargo">
                         <option th:each="c : ${cargos}" th:text="${c}" th:value="${c}"></option>
@@ -22,6 +24,7 @@
                 </label>
                 <label>Salario base <input name="salarioBase" required></label>
                 <label>Teléfono <input name="telefono"></label>
+                <label>Vacaciones gozadas (días) <input type="number" name="vacacionesGozadas" value="0" min="0"></label>
                 <div class="form-actions span-2">
                     <button class="btn btn-primary" type="submit">Guardar empleado</button>
                     <button class="btn btn-muted" type="button" data-reset-form="#form-empleado" hidden>Cancelar edición</button>
@@ -39,13 +42,15 @@
                 </label>
                 <label>Horas extras (Lps) <input name="horasExtras" value="0"></label>
                 <label>Viáticos (Lps) <input name="viaticos" value="0"></label>
+                <label>Deducciones (Lps) <input name="deducciones" value="0"></label>
+                <label class="check"><input type="checkbox" name="aplica14vo" value="true"> Aplicar 14vo mes (junio / proporcional)</label>
+                <label class="check"><input type="checkbox" name="aplicaAguinaldo" value="true"> Aplicar aguinaldo (diciembre / proporcional)</label>
                 <button class="btn btn-accent" type="submit">Cerrar planilla</button>
             </form>
             <form method="get" th:action="@{/reportes/planilla}" class="form-grid" style="margin-top:1rem" target="_blank">
                 <label>Comprobante Jasper
                     <select name="empleadoId" required>
-                        <option th:each="e : ${empleados}" th:value="${e.id}"
-                                th:text="${e.nombreCompleto}"></option>
+                        <option th:each="e : ${empleados}" th:value="${e.id}" th:text="${e.nombreCompleto}"></option>
                     </select>
                 </label>
                 <button class="btn btn-primary" type="submit">Abrir PDF</button>
@@ -53,32 +58,50 @@
         </section>
     </div>
 
+    <section class="card" sec:authorize="hasRole('CONTADOR')">
+        <h2>Comprobante Jasper</h2>
+        <form method="get" th:action="@{/reportes/planilla}" class="form-grid" target="_blank">
+            <label>Empleado
+                <select name="empleadoId" required>
+                    <option th:each="e : ${empleados}" th:value="${e.id}" th:text="${e.nombreCompleto}"></option>
+                </select>
+            </label>
+            <button class="btn btn-primary" type="submit">Abrir PDF</button>
+        </form>
+    </section>
+
     <section class="card">
-        <h2>Personal</h2>
-        <input class="table-search" data-table="#tabla-empleados" placeholder="Buscar por nombre, cargo o teléfono">
+        <h2>Personal y vacaciones</h2>
+        <input class="table-search" data-table="#tabla-empleados" placeholder="Buscar por nombre, identidad o cargo">
         <div class="table-wrap">
             <table id="tabla-empleados">
                 <thead>
-                <tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Cargo</th><th>Salario</th><th>Teléfono</th><th></th></tr>
+                <tr><th>ID</th><th>Identidad</th><th>Nombre</th><th>Cargo</th><th>Ingreso</th><th>Salario</th><th>Vac. derecho</th><th>Gozadas</th><th>Pendientes</th><th sec:authorize="hasRole('ADMIN')"></th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="e : ${empleados}">
                     <td th:text="${e.id}"></td>
-                    <td th:text="${e.nombre}"></td>
-                    <td th:text="${e.apellido}"></td>
+                    <td th:text="${e.identidad}"></td>
+                    <td th:text="${e.nombreCompleto}"></td>
                     <td th:text="${e.cargo}"></td>
+                    <td th:text="${e.fechaIngreso}"></td>
                     <td th:text="${#numbers.formatDecimal(e.salarioBase,1,2)}"></td>
-                    <td th:text="${e.telefono}"></td>
-                    <td>
+                    <td th:text="${e.vacacionesDerecho}"></td>
+                    <td th:text="${e.vacacionesGozadas}"></td>
+                    <td th:text="${e.vacacionesPendientes}"></td>
+                    <td sec:authorize="hasRole('ADMIN')">
                         <div class="row-actions">
                             <button type="button" class="btn btn-accent"
                                     data-edit="#form-empleado"
                                     th:attr="data-id=${e.id},
                                              data-nombre=${e.nombre},
                                              data-apellido=${e.apellido},
+                                             data-identidad=${e.identidad},
+                                             data-fechaingreso=${e.fechaIngreso},
                                              data-cargo=${e.cargo},
                                              data-salariobase=${e.salarioBase},
-                                             data-telefono=${e.telefono}">Editar</button>
+                                             data-telefono=${e.telefono},
+                                             data-vacacionesgozadas=${e.vacacionesGozadas}">Editar</button>
                             <form th:action="@{/planilla/empleado/borrar}" method="post"
                                   th:data-confirm="|¿Seguro que desea desactivar a ${e.nombreCompleto}?|">
                                 <input type="hidden" name="id" th:value="${e.id}">
@@ -98,7 +121,7 @@
         <div class="table-wrap">
             <table id="tabla-planillas">
                 <thead>
-                <tr><th>ID</th><th>Empleado</th><th>Salario</th><th>Extras</th><th>Viáticos</th><th>Neto</th><th>Fecha</th></tr>
+                <tr><th>ID</th><th>Empleado</th><th>Salario</th><th>Extras</th><th>Viáticos</th><th>14vo</th><th>Aguinaldo</th><th>Deducc.</th><th>Neto</th><th>Fecha</th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="p : ${planillas}">
@@ -107,6 +130,9 @@
                     <td th:text="${#numbers.formatDecimal(p.salarioBase,1,2)}"></td>
                     <td th:text="${#numbers.formatDecimal(p.horasExtras,1,2)}"></td>
                     <td th:text="${#numbers.formatDecimal(p.viaticos,1,2)}"></td>
+                    <td th:text="${p.aplica14vo} ? ${#numbers.formatDecimal(p.monto14vo,1,2)} : '—'"></td>
+                    <td th:text="${p.aplicaAguinaldo} ? ${#numbers.formatDecimal(p.montoAguinaldo,1,2)} : '—'"></td>
+                    <td th:text="${#numbers.formatDecimal(p.deducciones,1,2)}"></td>
                     <td th:text="${#numbers.formatDecimal(p.totalNeto,1,2)}"></td>
                     <td th:text="${p.fechaPago}"></td>
                 </tr>

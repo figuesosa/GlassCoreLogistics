@@ -10,6 +10,7 @@ import com.glasscore.dao.impl.ViajeDAOImpl;
 import com.glasscore.modelo.Herramienta;
 import com.glasscore.modelo.Vehiculo;
 import com.glasscore.modelo.Viaje;
+import com.glasscore.util.RutaCatalogo;
 import java.sql.Connection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,13 +52,22 @@ public class LogisticaServicio {
     }
 
     public ResultadoCalculo calcularRuta(boolean redondo) {
-        int km = redondo ? KM_REDONDO : KM_SIMPLE;
+        return calcularRuta("Tegucigalpa", "Comayagua", redondo);
+    }
+
+    public ResultadoCalculo calcularRuta(String origen, String destino, boolean redondo) {
+        int km = RutaCatalogo.kmViaje(origen, destino, redondo);
         double litros = Math.round(km * FACTOR_RENDIMIENTO * 1000.0) / 1000.0;
         double gasto = Math.round(litros * PRECIO_COMBUSTIBLE_LPS * 100.0) / 100.0;
         return new ResultadoCalculo(km, litros, gasto);
     }
 
     public Viaje autorizarYRegistrarViaje(int vehiculoId, boolean redondo) throws Exception {
+        return autorizarYRegistrarViaje(vehiculoId, "Tegucigalpa", "Comayagua", redondo);
+    }
+
+    public Viaje autorizarYRegistrarViaje(int vehiculoId, String origen, String destino, boolean redondo)
+            throws Exception {
         Vehiculo veh = vehiculoDAO.buscarPorId(vehiculoId);
         if (veh == null) {
             throw new IllegalArgumentException("Vehículo no encontrado.");
@@ -66,7 +76,7 @@ public class LogisticaServicio {
             throw new IllegalArgumentException("El vehículo no tiene chofer asignado.");
         }
 
-        ResultadoCalculo calc = calcularRuta(redondo);
+        ResultadoCalculo calc = calcularRuta(origen, destino, redondo);
         int proyeccion = veh.getKmActual() + calc.kilometros;
 
         if (proyeccion >= veh.getKmLimiteMantenimiento()) {
@@ -84,7 +94,9 @@ public class LogisticaServicio {
         viaje.setPlaca(veh.getPlaca());
         viaje.setChoferId(veh.getChoferId());
         viaje.setChoferNombre(veh.getChoferNombre());
-        viaje.setRuta(RUTA_FIJA + (redondo ? " (Redondo)" : " (Simple)"));
+        viaje.setOrigen(origen);
+        viaje.setDestino(destino);
+        viaje.setRuta(origen + " → " + destino + (redondo ? " (ida y vuelta)" : " (simple)"));
         viaje.setEsRedondo(redondo);
         viaje.setKilometros(calc.kilometros);
         viaje.setFactorRendimiento(FACTOR_RENDIMIENTO);
@@ -126,7 +138,17 @@ public class LogisticaServicio {
     }
 
     public List<Viaje> listarViajes() throws Exception {
-        return viajeDAO.listarTodos();
+        List<Viaje> viajes = viajeDAO.listarTodos();
+        for (Viaje v : viajes) {
+            List<Herramienta> herramientas = herramientaDAO.listarPorEmpleado(v.getChoferId());
+            String custodia = herramientas.isEmpty()
+                    ? "Sin herramientas asignadas"
+                    : herramientas.stream()
+                        .map(h -> h.getCodigo() + " " + h.getNombre())
+                        .collect(Collectors.joining(", "));
+            v.setHerramientasCustodia(custodia);
+        }
+        return viajes;
     }
 
     public Viaje buscarViaje(int id) throws Exception {

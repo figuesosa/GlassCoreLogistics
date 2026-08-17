@@ -18,6 +18,11 @@
             p.salario_base,
             p.horas_extras,
             p.viaticos,
+            COALESCE(p.aplica_14vo, 0) AS aplica_14vo,
+            COALESCE(p.aplica_aguinaldo, 0) AS aplica_aguinaldo,
+            COALESCE(p.monto_14vo, 0) AS monto_14vo,
+            COALESCE(p.monto_aguinaldo, 0) AS monto_aguinaldo,
+            COALESCE(p.deducciones, 0) AS deducciones,
             p.total_neto,
             p.fecha_pago
         FROM planilla p
@@ -33,6 +38,11 @@
     <field name="salario_base" class="java.math.BigDecimal"/>
     <field name="horas_extras" class="java.math.BigDecimal"/>
     <field name="viaticos" class="java.math.BigDecimal"/>
+    <field name="aplica_14vo" class="java.lang.Integer"/>
+    <field name="aplica_aguinaldo" class="java.lang.Integer"/>
+    <field name="monto_14vo" class="java.math.BigDecimal"/>
+    <field name="monto_aguinaldo" class="java.math.BigDecimal"/>
+    <field name="deducciones" class="java.math.BigDecimal"/>
     <field name="total_neto" class="java.math.BigDecimal"/>
     <field name="fecha_pago" class="java.sql.Date"/>
     <title>
@@ -61,7 +71,7 @@
         </band>
     </title>
     <detail>
-        <band height="220" splitType="Stretch">
+        <band height="320" splitType="Stretch">
             <staticText>
                 <reportElement x="20" y="10" width="140" height="20" uuid="fdcf4578-decc-4e10-a878-d7690589c2fc"/>
                 <textElement><font isBold="true"/></textElement>
@@ -126,12 +136,39 @@
                 <textFieldExpression><![CDATA[$F{viaticos}]]></textFieldExpression>
             </textField>
             <staticText>
-                <reportElement x="20" y="195" width="200" height="20" uuid="c1b3c336-06dc-4a49-b428-b34ebbd0642f"/>
+                <reportElement x="20" y="195" width="200" height="20" uuid="a11b3c336-06dc-4a49-b428-b34ebbd0642f"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[14vo mes (checkbox):]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="240" y="195" width="250" height="20" uuid="b11fc6e3-76d2-4a3a-a7ca-506ebe48256b"/>
+                <textFieldExpression><![CDATA[($F{aplica_14vo} != null && $F{aplica_14vo} == 1 ? "SI · Lps " : "NO · Lps ") + $F{monto_14vo}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="220" width="200" height="20" uuid="c11b3c336-06dc-4a49-b428-b34ebbd0642f"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Aguinaldo (checkbox):]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="240" y="220" width="250" height="20" uuid="d11fc6e3-76d2-4a3a-a7ca-506ebe48256b"/>
+                <textFieldExpression><![CDATA[($F{aplica_aguinaldo} != null && $F{aplica_aguinaldo} == 1 ? "SI · Lps " : "NO · Lps ") + $F{monto_aguinaldo}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="245" width="200" height="20" uuid="e11b3c336-06dc-4a49-b428-b34ebbd0642f"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Deducciones (Lps):]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="240" y="245" width="150" height="20" uuid="f11fc6e3-76d2-4a3a-a7ca-506ebe48256b"/>
+                <textFieldExpression><![CDATA[$F{deducciones}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="275" width="200" height="20" uuid="c1b3c336-06dc-4a49-b428-b34ebbd0642f"/>
                 <textElement><font size="12" isBold="true"/></textElement>
                 <text><![CDATA[TOTAL NETO (Lps):]]></text>
             </staticText>
             <textField pattern="#,##0.00">
-                <reportElement x="240" y="195" width="150" height="20" uuid="102fc6e3-76d2-4a3a-a7ca-506ebe48256b"/>
+                <reportElement x="240" y="275" width="150" height="20" uuid="102fc6e3-76d2-4a3a-a7ca-506ebe48256b"/>
                 <textElement><font size="12" isBold="true"/></textElement>
                 <textFieldExpression><![CDATA[$F{total_neto}]]></textFieldExpression>
             </textField>

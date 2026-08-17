@@ -9,6 +9,9 @@ public class Empleado {
     private double salarioBase;
     private String telefono;
     private boolean activo;
+    private String identidad;
+    private java.time.LocalDate fechaIngreso;
+    private int vacacionesGozadas;
 
     public Empleado() {
     }
@@ -78,6 +81,21 @@ public class Empleado {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getIdentidad() { return identidad; }
+    public void setIdentidad(String identidad) { this.identidad = identidad; }
+    public java.time.LocalDate getFechaIngreso() { return fechaIngreso; }
+    public void setFechaIngreso(java.time.LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+    public int getVacacionesGozadas() { return vacacionesGozadas; }
+    public void setVacacionesGozadas(int vacacionesGozadas) { this.vacacionesGozadas = vacacionesGozadas; }
+
+    public int getVacacionesDerecho() {
+        return com.glasscore.util.DiasHabiles.vacacionesDerecho(fechaIngreso, java.time.LocalDate.now());
+    }
+
+    public int getVacacionesPendientes() {
+        return Math.max(0, getVacacionesDerecho() - vacacionesGozadas);
     }
 
     public String getNombreCompleto() {

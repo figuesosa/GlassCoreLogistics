@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Clientes')}"></head>
+<body>
+<header th:replace="~{fragments :: top('clientes')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Clientes</h1>
+    <p class="lead">Unicidad estricta por identidad / RTN. Se vinculan a cotizaciones y ventas.</p>
+    <section class="card">
+        <h2 data-form-title data-new-label="Registrar cliente" data-edit-label="Editar cliente">Registrar cliente</h2>
+        <form id="form-cliente" th:action="@{/clientes/guardar}" method="post" class="form-grid two">
+            <input type="hidden" name="id">
+            <label>Nombre <input name="nombre" required></label>
+            <label>Identidad / RTN <input name="identidadRtn" required></label>
+            <label>Teléfono <input name="telefono"></label>
+            <label>Correo <input name="email" type="email"></label>
+            <label class="span-2">Dirección <input name="direccion"></label>
+            <div class="form-actions span-2">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <button class="btn btn-muted" type="button" data-reset-form="#form-cliente" hidden>Cancelar edición</button>
+            </div>
+        </form>
+    </section>
+    <section class="card">
+        <h2>Registrados</h2>
+        <input class="table-search" data-table="#tabla-clientes" placeholder="Buscar cliente o documento">
+        <div class="table-wrap">
+            <table id="tabla-clientes">
+                <thead>
+                <tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Correo</th><th>Dirección</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${clientes}">
+                    <td th:text="${c.id}"></td>
+                    <td th:text="${c.nombre}"></td>
+                    <td th:text="${c.identidadRtn}"></td>
+                    <td th:text="${c.telefono}"></td>
+                    <td th:text="${c.email}"></td>
+                    <td th:text="${c.direccion}"></td>
+                    <td>
+                        <button type="button" class="btn btn-accent"
+                                data-edit="#form-cliente"
+                                th:attr="data-id=${c.id},
+                                         data-nombre=${c.nombre},
+                                         data-identidadrtn=${c.identidadRtn},
+                                         data-telefono=${c.telefono},
+                                         data-email=${c.email},
+                                         data-direccion=${c.direccion}">Editar</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

@@ -3,6 +3,8 @@ package com.glasscore.util;
 import com.glasscore.conexion.ConexionDB;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -29,6 +31,15 @@ public final class ReporteUtil {
         return generarPdf("reportes/HojaRutaDespacho.jasper", "reportes/HojaRutaDespacho.jrxml", params);
     }
 
+    public static byte[] generarVentasPdf(LocalDateTime desde, LocalDateTime hasta, String periodo)
+            throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("FECHA_DESDE", Timestamp.valueOf(desde));
+        params.put("FECHA_HASTA", Timestamp.valueOf(hasta));
+        params.put("PERIODO", periodo);
+        return generarPdf("reportes/VentasContable.jasper", "reportes/VentasContable.jrxml", params);
+    }
+
     private static byte[] generarPdf(String jasperPath, String jrxmlPath,
                                      Map<String, Object> params) throws Exception {
         JasperReport report = cargarReporte(jasperPath, jrxmlPath);
@@ -43,18 +54,18 @@ public final class ReporteUtil {
     }
 
     private static JasperReport cargarReporte(String jasperPath, String jrxmlPath) throws Exception {
-        InputStream jasperStream = ReporteUtil.class.getClassLoader().getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            try (jasperStream) {
-                return (JasperReport) JRLoader.loadObject(jasperStream);
+        InputStream jrxml = ReporteUtil.class.getClassLoader().getResourceAsStream(jrxmlPath);
+        if (jrxml != null) {
+            try (InputStream in = jrxml) {
+                return JasperCompileManager.compileReport(in);
             }
         }
-        InputStream jrxmlStream = ReporteUtil.class.getClassLoader().getResourceAsStream(jrxmlPath);
-        if (jrxmlStream == null) {
-            throw new IllegalStateException("No se encontró el reporte: " + jasperPath + " / " + jrxmlPath);
+        InputStream jasper = ReporteUtil.class.getClassLoader().getResourceAsStream(jasperPath);
+        if (jasper != null) {
+            try (InputStream in = jasper) {
+                return (JasperReport) JRLoader.loadObject(in);
+            }
         }
-        try (jrxmlStream) {
-            return JasperCompileManager.compileReport(jrxmlStream);
-        }
+        throw new IllegalStateException("No se encontró el reporte: " + jasperPath + " / " + jrxmlPath);
     }
 }

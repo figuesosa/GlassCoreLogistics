@@ -23,6 +23,8 @@ public class UsuarioSeed {
     public void seed() throws Exception {
         crearSiFalta("admin", "admin123", "ADMIN", 5);
         crearSiFalta("operador", "operador123", "OPERADOR", 1);
+        crearSiFalta("contador", "contador123", "CONTADOR", 5);
+        crearSiFalta("cajero", "cajero123", "CAJERO", 4);
     }
 
     private void crearSiFalta(String username, String password, String rol, Integer empleadoId)

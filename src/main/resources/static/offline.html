@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#273877">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/img/logo.svg">
     <link rel="stylesheet" href="/css/app.css">
     <title>Sin conexión · GlassCore</title>
 </head>
@@ -11,9 +13,49 @@
 <main class="page">
     <section class="card">
         <h1 class="page-title">Sin conexión</h1>
-        <p>El menú visual está en caché, pero las operaciones (MySQL, login y Jasper) requieren red.</p>
-        <a class="btn btn-primary" href="/">Reintentar</a>
+        <p>La interfaz quedó en este dispositivo. Login, MySQL y PDF Jasper necesitan red.</p>
+        <div class="form-actions" style="margin-top:1rem">
+            <a class="btn btn-primary" href="/">Reintentar inicio</a>
+            <a class="btn btn-accent" href="/login">Ir al login</a>
+        </div>
+    </section>
+    <section class="card">
+        <h2>Hojas de ruta en campo</h2>
+        <p class="muted">Últimas salidas guardadas en este teléfono (si ya abrió Logística con señal).</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>Viaje</th><th>Ruta</th><th>Chofer</th><th>Km</th><th>Combustible</th><th>Custodia</th></tr>
+                </thead>
+                <tbody id="viajes-offline">
+                <tr><td colspan="6" class="muted">Cargando caché…</td></tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 </main>
+<script>
+(function () {
+  var tbody = document.getElementById('viajes-offline');
+  function pintar(lista) {
+    if (!lista || !lista.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="muted">No hay hojas de ruta en caché. Ábralas en línea una vez.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = lista.map(function (v) {
+      return '<tr><td>#' + v.id + '</td><td>' + (v.ruta || (v.origen + ' → ' + v.destino)) +
+        '</td><td>' + (v.chofer || '') + '</td><td>' + (v.kilometros || '') +
+        '</td><td>Lps ' + (v.gastoLps || 0) + '</td><td>' + (v.herramientas || '') + '</td></tr>';
+    }).join('');
+  }
+  if (!('caches' in window)) {
+    pintar([]);
+    return;
+  }
+  caches.match('/api/campo/viajes').then(function (res) {
+    return res ? res.json() : [];
+  }).then(pintar).catch(function () { pintar([]); });
+})();
+</script>
 </body>
 </html>

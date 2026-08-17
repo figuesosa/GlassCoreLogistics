@@ -6,7 +6,7 @@
 <main class="page">
     <div th:replace="~{fragments :: flashes}"></div>
     <h1 class="page-title">Logística</h1>
-    <p class="lead">Ruta fija Tegucigalpa-Comayagua. 85 km sencillo, 170 km redondo. 0.12 L/km a Lps 32.50.</p>
+    <p class="lead">Kilometraje dinámico origen → destino (ida y vuelta si marca redondo). 0.12 L/km a Lps 32.50. Si km actual + viaje ≥ límite, se bloquea la salida.</p>
 
     <section class="card">
         <h2 data-form-title data-new-label="Vehículo" data-edit-label="Editar vehículo">Vehículo</h2>
@@ -65,23 +65,36 @@
     </section>
 
     <section class="card">
-        <h2>Autorizar salida</h2>
+        <h2>Autorizar salida A → B</h2>
         <p th:if="${calc}">
             Cálculo:
+            <strong th:text="${origen} + ' → ' + ${destino}"></strong> ·
             <strong th:text="${calc.kilometros} + ' km'"></strong> ·
             <span th:text="${#numbers.formatDecimal(calc.litros,1,3)} + ' L'"></span> ·
             <span th:text="'Lps ' + ${#numbers.formatDecimal(calc.gastoLps,1,2)}"></span>
         </p>
-        <form method="get" th:action="@{/logistica}" class="form-grid">
-            <label class="check">
+        <form method="get" th:action="@{/logistica}" class="form-grid two">
+            <label>Origen
+                <select name="origen">
+                    <option th:each="c : ${ciudades}" th:value="${c}" th:text="${c}" th:selected="${c==origen}"></option>
+                </select>
+            </label>
+            <label>Destino
+                <select name="destino">
+                    <option th:each="c : ${ciudades}" th:value="${c}" th:text="${c}" th:selected="${c==destino}"></option>
+                </select>
+            </label>
+            <label class="check span-2">
                 <input type="checkbox" name="redondo" value="true" th:checked="${redondo}">
-                Viaje redondo (170 km)
+                Ida y vuelta (duplica el kilometraje)
             </label>
             <button class="btn btn-accent" type="submit">Recalcular</button>
         </form>
-        <form th:action="@{/logistica/autorizar}" method="post" class="form-grid">
+        <form th:action="@{/logistica/autorizar}" method="post" class="form-grid two">
             <input type="hidden" name="redondo" th:value="${redondo}">
-            <label>Vehículo
+            <input type="hidden" name="origen" th:value="${origen}">
+            <input type="hidden" name="destino" th:value="${destino}">
+            <label class="span-2">Vehículo
                 <select name="vehiculoId" required>
                     <option th:each="v : ${vehiculos}" th:value="${v.id}"
                             th:text="${v.placa} + ' · ' + ${v.marca} + ' (km ' + ${v.kmActual} + ')'"></option>
@@ -92,7 +105,7 @@
     </section>
 
     <section class="card">
-        <h2>Viajes</h2>
+        <h2>Viajes y hoja de ruta</h2>
         <form method="get" th:action="@{/reportes/hoja-ruta}" class="form-grid" target="_blank">
             <label>Hoja de ruta Jasper
                 <select name="viajeId" required>
@@ -106,7 +119,7 @@
         <div class="table-wrap">
             <table id="tabla-viajes">
                 <thead>
-                <tr><th>ID</th><th>Placa</th><th>Chofer</th><th>Ruta</th><th>Km</th><th>Litros</th><th>Gasto</th><th>Fecha</th></tr>
+                <tr><th>ID</th><th>Placa</th><th>Chofer</th><th>Ruta</th><th>Km</th><th>Litros</th><th>Gasto</th><th>Custodia</th><th>Fecha</th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="vi : ${viajes}">
@@ -117,6 +130,7 @@
                     <td th:text="${vi.kilometros}"></td>
                     <td th:text="${#numbers.formatDecimal(vi.litrosEstimados,1,3)}"></td>
                     <td th:text="${#numbers.formatDecimal(vi.gastoCombustible,1,2)}"></td>
+                    <td th:text="${vi.herramientasCustodia}"></td>
                     <td th:text="${vi.fechaSalida}"></td>
                 </tr>
                 </tbody>

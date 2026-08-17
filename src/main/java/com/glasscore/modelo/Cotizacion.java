@@ -13,8 +13,16 @@ public class Cotizacion {
     private double metrosAluminio;
     private double metrosMetal;
     private double subtotal;
+    private double isv;
+    private double total;
+    private int vigenciaDias;
+    private LocalDateTime fechaVencimiento;
     private String alertaCompra;
     private LocalDateTime fecha;
+    private Integer clienteId;
+    private String estado = "VIGENTE";
+    private String numeroFactura;
+    private String caiUsado;
 
     public Cotizacion() {
     }
@@ -91,6 +99,46 @@ public class Cotizacion {
         this.subtotal = subtotal;
     }
 
+    public double getIsv() {
+        return isv;
+    }
+
+    public void setIsv(double isv) {
+        this.isv = isv;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public int getVigenciaDias() {
+        return vigenciaDias;
+    }
+
+    public void setVigenciaDias(int vigenciaDias) {
+        this.vigenciaDias = vigenciaDias;
+    }
+
+    public LocalDateTime getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public boolean isVencida() {
+        return fechaVencimiento != null && LocalDateTime.now().isAfter(fechaVencimiento);
+    }
+
+    public String getEstadoVigencia() {
+        return isVencida() ? "VENCIDA" : "VIGENTE";
+    }
+
     public String getAlertaCompra() {
         return alertaCompra;
     }
@@ -105,5 +153,25 @@ public class Cotizacion {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public Integer getClienteId() { return clienteId; }
+    public void setClienteId(Integer clienteId) { this.clienteId = clienteId; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public String getNumeroFactura() { return numeroFactura; }
+    public void setNumeroFactura(String numeroFactura) { this.numeroFactura = numeroFactura; }
+    public String getCaiUsado() { return caiUsado; }
+    public void setCaiUsado(String caiUsado) { this.caiUsado = caiUsado; }
+
+    public boolean isConvertida() {
+        return "CONVERTIDA_A_VENTA".equals(estado);
+    }
+
+    public String getEstadoMostrado() {
+        if (isConvertida()) {
+            return "CONVERTIDA_A_VENTA";
+        }
+        return isVencida() ? "VENCIDA" : "VIGENTE";
     }
 }

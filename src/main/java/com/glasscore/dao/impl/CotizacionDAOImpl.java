@@ -16,7 +16,8 @@ public class CotizacionDAOImpl implements CotizacionDAO {
     @Override
     public int insertar(Cotizacion c) throws Exception {
         String sql = "INSERT INTO cotizacion (cliente, tipo_estructura, ancho, alto, area_vidrio, "
-                + "metros_aluminio, metros_metal, subtotal, alerta_compra) VALUES (?,?,?,?,?,?,?,?,?)";
+                + "metros_aluminio, metros_metal, subtotal, isv, total, vigencia_dias, fecha_vencimiento, alerta_compra, "
+                + "cliente_id, estado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection cn = ConexionDB.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, c.getCliente());
@@ -27,7 +28,17 @@ public class CotizacionDAOImpl implements CotizacionDAO {
             ps.setDouble(6, c.getMetrosAluminio());
             ps.setDouble(7, c.getMetrosMetal());
             ps.setDouble(8, c.getSubtotal());
-            ps.setString(9, c.getAlertaCompra());
+            ps.setDouble(9, c.getIsv());
+            ps.setDouble(10, c.getTotal());
+            ps.setInt(11, c.getVigenciaDias());
+            ps.setTimestamp(12, Timestamp.valueOf(c.getFechaVencimiento()));
+            ps.setString(13, c.getAlertaCompra());
+            if (c.getClienteId() == null) {
+                ps.setNull(14, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(14, c.getClienteId());
+            }
+            ps.setString(15, c.getEstado() == null ? "VIGENTE" : c.getEstado());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -50,6 +61,23 @@ public class CotizacionDAOImpl implements CotizacionDAO {
             }
         }
         return lista;
+    }
+
+    @Override
+    public void marcarConvertida(int id, String numeroFactura, String cai) throws Exception {
+        try (Connection cn = ConexionDB.getConnection()) {
+            marcarConvertida(cn, id, numeroFactura, cai);
+        }
+    }
+
+    public void marcarConvertida(Connection cn, int id, String numeroFactura, String cai) throws Exception {
+        try (PreparedStatement ps = cn.prepareStatement(
+                "UPDATE cotizacion SET estado='CONVERTIDA_A_VENTA', numero_factura=?, cai_usado=? WHERE id=?")) {
+            ps.setString(1, numeroFactura);
+            ps.setString(2, cai);
+            ps.setInt(3, id);
+            ps.executeUpdate();
+        }
     }
 
     @Override
@@ -78,10 +106,26 @@ public class CotizacionDAOImpl implements CotizacionDAO {
         c.setMetrosAluminio(rs.getDouble("metros_aluminio"));
         c.setMetrosMetal(rs.getDouble("metros_metal"));
         c.setSubtotal(rs.getDouble("subtotal"));
+        c.setIsv(rs.getDouble("isv"));
+        c.setTotal(rs.getDouble("total"));
+        c.setVigenciaDias(rs.getInt("vigencia_dias"));
+        Timestamp venc = rs.getTimestamp("fecha_vencimiento");
+        if (venc != null) {
+            c.setFechaVencimiento(venc.toLocalDateTime());
+        }
         c.setAlertaCompra(rs.getString("alerta_compra"));
         Timestamp ts = rs.getTimestamp("fecha");
         if (ts != null) {
             c.setFecha(ts.toLocalDateTime());
+        }
+        try {
+            int cid = rs.getInt("cliente_id");
+            c.setClienteId(rs.wasNull() ? null : cid);
+            c.setEstado(rs.getString("estado"));
+            c.setNumeroFactura(rs.getString("numero_factura"));
+            c.setCaiUsado(rs.getString("cai_usado"));
+        } catch (Exception ignored) {
+            c.setEstado("VIGENTE");
         }
         return c;
     }

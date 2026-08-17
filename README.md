@@ -1,17 +1,25 @@
 # GlassCore Logistics
 
-Aplicación web para una vidriería: cotizaciones por medida, inventario de herramientas, planilla, usuarios y logística Tegucigalpa–Comayagua.
+Plataforma web de la vidriería GlassCore: cotización a medida, facturación SAR, clientes/proveedores, planilla (14vo y aguinaldo), inventario, herramientas, logística A→B y reportería Jasper. PWA instalable.
 
 Demo: [https://glasscorelogistics.onrender.com](https://glasscorelogistics.onrender.com)
 
 ## Stack
 
 - Java 17, Spring Boot 3.3, Thymeleaf, Spring Security
-- MySQL 8
-- JasperReports (PDF de planilla y hoja de ruta)
+- MySQL 8, patrón DAO (JDBC, sin JPA)
+- JasperReports (planilla, hoja de ruta, ventas contables)
 - Maven / NetBeans
+- PWA (`manifest.json` + `sw.js`): interfaz en caché y consulta offline de hojas de ruta
 
-El admin ve planilla y usuarios. El operador no.
+## Roles (RBAC)
+
+| Rol | Acceso |
+| --- | --- |
+| ADMIN | Todos los módulos, fiscal SAR y usuarios |
+| CONTADOR | Reportes, histórico de planilla, facturación emitida |
+| CAJERO | Clientes, cotizaciones y conversión a venta |
+| OPERADOR | Inventario, herramientas y logística de campo |
 
 ## Cómo correrla en local
 
@@ -22,44 +30,27 @@ El admin ve planilla y usuarios. El operador no.
 SOURCE sql/glasscore_db.sql;
 ```
 
-Eso crea `glasscore_db` con datos de prueba (stock de vidrio 26 m², Hilux cerca de mantenimiento, etc.).
-
-3. Revisar usuario/clave de MySQL en `src/main/resources/application.properties`. Por defecto usa `root` en `localhost:3306`.
-
-4. Abrir el proyecto en NetBeans y **Run**. O en consola:
-
-```
-mvn spring-boot:run
-```
-
+3. Revisar usuario/clave de MySQL en `src/main/resources/application.properties`.
+4. En NetBeans: **Run**. O en consola: `mvn spring-boot:run`
 5. Abrir [http://localhost:8080](http://localhost:8080)
 
-Si la base está vacía (por ejemplo Aiven `defaultdb`), al arrancar se crean las tablas y se cargan los datos demo solos.
+Si la base está vacía, al arrancar se crean tablas, parámetros fiscales demo y los 12 módulos.
 
-## Módulos
+## Módulos (enunciado UTH Avanzada II)
 
-- **Inicio** — stock bajo, flota cerca de mantenimiento, cotizaciones recientes, clima TGU y tipo de cambio
-- **Herramientas** — alta, edición, asignación y devolución
-- **Cotizaciones** — ancho × alto; si el vidrio no alcanza, guarda igual y marca alerta de compra
-- **Planilla** — empleados, cierre de pago y PDF Jasper (solo admin)
-- **Usuarios** — crear / editar / borrar cuentas y cambiar contraseña (solo admin)
-- **Logística** — vehículos, autorización de salida (85 km / 170 km redondo) y PDF de hoja de ruta
+1. **Acceso y roles** — autenticación y perfiles Admin / Contador / Cajero
+2. **Fiscal SAR** — RTN, CAI, fecha límite, rango y correlativo automático
+3. **Cotizaciones** — ancho × alto, vigencia 2–15 días hábiles, alerta de compra sin bloquear
+4. **Facturación** — orden vigente → factura, descargo de inventario, estado `CONVERTIDA_A_VENTA`
+5. **Clientes** — contacto completo, unicidad por identidad / RTN
+6. **Proveedores** — varios teléfonos y agentes comerciales
+7. **Empleados** — identidad única, ingreso y vacaciones por antigüedad
+8. **Planilla** — neto + checkbox 14vo/aguinaldo proporcional + PDF
+9. **Inventario** — vidrio (m²), aluminio y metal (m lineales)
+10. **Herramientas** — DISPONIBLE → ASIGNADA al entregarse
+11. **Logística** — ruta A→B ida/vuelta, combustible Lps, bloqueo por mantenimiento
+12. **Reportes** — ventas mensual/trimestral/anual (ejecutivo y contable), planilla y hoja de ruta
 
 ## Despliegue (Render + Aiven)
 
-Servicio Docker. El `Dockerfile` está en la raíz. Variables de entorno:
-
-- `SPRING_DATASOURCE_URL` — JDBC de Aiven (`defaultdb`, `sslMode=REQUIRED`)
-- `SPRING_DATASOURCE_USERNAME`
-- `SPRING_DATASOURCE_PASSWORD`
-
-No definir `PORT`: Render lo inyecta. Health check: `/login`.
-
-## Estructura
-
-```
-src/main/java/com/glasscore/   controladores, servicios, DAO
-src/main/resources/templates/  páginas Thymeleaf
-src/main/resources/static/     CSS, JS, iconos PWA
-sql/glasscore_db.sql           script para MySQL local
-```
+Servicio Docker. Variables: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`. Health check: `/login`.

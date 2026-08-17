@@ -1,12 +1,57 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
-<head th:replace="~{fragments :: head('Inicio')}"></head>
+<head th:replace="~{fragments :: head('Dashboard')}"></head>
 <body>
 <header th:replace="~{fragments :: top('inicio')}"></header>
 <main class="page">
     <div th:replace="~{fragments :: flashes}"></div>
-    <h1 class="page-title">Inicio</h1>
-    <p class="lead">Vidriería GlassCore. Cotización por medida, planilla, herramientas y despacho TGU-Comayagua.</p>
+    <h1 class="page-title">Dashboard ejecutivo</h1>
+    <p class="lead">KPIs de GlassCore para la toma de decisiones. Navegue a los 12 módulos del sistema.</p>
+
+    <div class="kpis">
+        <div class="kpi">
+            <span>Facturación del mes</span>
+            <strong th:text="'Lps ' + ${#numbers.formatDecimal(kpiVentasMes ?: 0,1,2)}">Lps 0</strong>
+        </div>
+        <div class="kpi">
+            <span>Ventas del mes</span>
+            <strong th:text="${kpiVentasCantidad ?: 0}">0</strong>
+        </div>
+        <div class="kpi">
+            <span>Cotizaciones vigentes</span>
+            <strong th:text="${kpiCotizaciones ?: 0}">0</strong>
+        </div>
+        <div class="kpi">
+            <span>CAI restantes</span>
+            <strong th:text="${kpiCaiRestantes ?: 0}">0</strong>
+        </div>
+        <div class="kpi">
+            <span>Planillas registradas</span>
+            <strong th:text="${kpiPlanillas ?: 0}">0</strong>
+        </div>
+        <div class="kpi">
+            <span>Cotizaciones vencidas</span>
+            <strong th:text="${cotizacionesVencidas ?: 0}">0</strong>
+        </div>
+    </div>
+
+    <section class="card">
+        <h2>12 módulos principales</h2>
+        <div class="modulos">
+            <a class="mod" th:href="@{/usuarios}" sec:authorize="hasRole('ADMIN')">1. Acceso y roles<br><span>RBAC Admin / Contador / Cajero</span></a>
+            <a class="mod" th:href="@{/fiscal}" sec:authorize="hasRole('ADMIN')">2. Configuración fiscal<br><span>RTN, CAI y rangos SAR</span></a>
+            <a class="mod" th:href="@{/cotizaciones}" sec:authorize="hasAnyRole('ADMIN','CAJERO')">3. Cotizaciones<br><span>Medida, vigencia 2–15 hábiles</span></a>
+            <a class="mod" th:href="@{/ventas}" sec:authorize="hasAnyRole('ADMIN','CAJERO','CONTADOR')">4. Facturación<br><span>Conversión a venta y CAI</span></a>
+            <a class="mod" th:href="@{/clientes}" sec:authorize="hasAnyRole('ADMIN','CAJERO')">5. Clientes<br><span>Unicidad por identidad / RTN</span></a>
+            <a class="mod" th:href="@{/proveedores}" sec:authorize="hasRole('ADMIN')">6. Proveedores<br><span>Teléfonos y agentes</span></a>
+            <a class="mod" th:href="@{/planilla}" sec:authorize="hasAnyRole('ADMIN','CONTADOR')">7. Empleados<br><span>Vacaciones y antigüedad</span></a>
+            <a class="mod" th:href="@{/planilla}" sec:authorize="hasAnyRole('ADMIN','CONTADOR')">8. Planilla<br><span>14vo, aguinaldo y neto</span></a>
+            <a class="mod" th:href="@{/inventario}" sec:authorize="hasAnyRole('ADMIN','CAJERO','OPERADOR')">9. Inventario<br><span>Vidrio, aluminio y metal</span></a>
+            <a class="mod" th:href="@{/herramientas}" sec:authorize="hasAnyRole('ADMIN','OPERADOR')">10. Herramientas<br><span>Disponible → Asignada</span></a>
+            <a class="mod" th:href="@{/logistica}" sec:authorize="hasAnyRole('ADMIN','OPERADOR')">11. Logística<br><span>Ruta A→B y mantenimiento</span></a>
+            <a class="mod" th:href="@{/reportes}" sec:authorize="hasAnyRole('ADMIN','CONTADOR')">12. Reportes<br><span>Ventas, planilla y hoja de ruta</span></a>
+        </div>
+    </section>
 
     <div class="grid-2">
         <section class="card">
@@ -39,16 +84,16 @@
         <div class="table-wrap" th:if="${cotizacionesRecientes != null and !cotizacionesRecientes.isEmpty()}">
             <table>
                 <thead>
-                <tr><th>Cliente</th><th>Tipo</th><th>m²</th><th>Subtotal</th><th>Fecha</th><th></th></tr>
+                <tr><th>Cliente</th><th>Tipo</th><th>m²</th><th>Total + ISV</th><th>Vence</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="c : ${cotizacionesRecientes}">
                     <td th:text="${c.cliente}"></td>
                     <td th:text="${c.tipoEstructura}"></td>
                     <td th:text="${#numbers.formatDecimal(c.areaVidrio,1,3)}"></td>
-                    <td th:text="${#numbers.formatDecimal(c.subtotal,1,2)}"></td>
-                    <td th:text="${c.fecha != null ? #temporals.format(c.fecha, 'dd/MM/yyyy') : '—'}"></td>
-                    <td><span th:if="${c.alertaCompra}" class="badge warn">ALERTA</span></td>
+                    <td th:text="${#numbers.formatDecimal(c.total > 0 ? c.total : c.subtotal,1,2)}"></td>
+                    <td th:text="${c.fechaVencimiento != null ? #temporals.format(c.fechaVencimiento, 'dd/MM/yyyy') : '—'}"></td>
+                    <td><span class="badge" th:classappend="${c.estadoMostrado=='VIGENTE'} ? ' ok' : ' warn'" th:text="${c.estadoMostrado}"></span></td>
                 </tr>
                 </tbody>
             </table>
@@ -76,16 +121,6 @@
             <p class="muted" th:if="${divisa}" th:text="'Actualizado: ' + ${divisa.actualizado}"></p>
         </section>
     </div>
-    <section class="card">
-        <h2>Módulos</h2>
-        <div class="modulos">
-            <a class="mod" th:href="@{/herramientas}">Herramientas<br><span>Asignar y devolver</span></a>
-            <a class="mod" th:href="@{/cotizaciones}">Cotizaciones<br><span>Ancho x alto</span></a>
-            <a class="mod" th:href="@{/planilla}" sec:authorize="hasRole('ADMIN')">Planilla<br><span>Empleados y pagos</span></a>
-            <a class="mod" th:href="@{/usuarios}" sec:authorize="hasRole('ADMIN')">Usuarios<br><span>Crear y borrar accesos</span></a>
-            <a class="mod" th:href="@{/logistica}">Logística<br><span>Vehículos y combustible</span></a>
-        </div>
-    </section>
 </main>
 <script th:replace="~{fragments :: scripts}"></script>
 </body>

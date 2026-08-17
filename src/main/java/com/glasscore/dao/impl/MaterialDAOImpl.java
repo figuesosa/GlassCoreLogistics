@@ -55,6 +55,16 @@ public class MaterialDAOImpl implements MaterialDAO {
         return 0;
     }
 
+    @Override
+    public void descontarPorTipo(java.sql.Connection cn, String tipo, double cantidad) throws Exception {
+        String sql = "UPDATE material SET stock = GREATEST(0, stock - ?) WHERE tipo=? LIMIT 1";
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setDouble(1, cantidad);
+            ps.setString(2, tipo);
+            ps.executeUpdate();
+        }
+    }
+
     private Material map(ResultSet rs) throws Exception {
         Material m = new Material();
         m.setId(rs.getInt("id"));

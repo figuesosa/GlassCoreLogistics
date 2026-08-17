@@ -19,13 +19,28 @@
     </a>
     <nav class="nav">
         <a th:href="@{/}" th:classappend="${modulo=='inicio'} ? ' active'">Inicio</a>
-        <a th:href="@{/herramientas}" th:classappend="${modulo=='herramientas'} ? ' active'">Herramientas</a>
-        <a th:href="@{/cotizaciones}" th:classappend="${modulo=='cotizaciones'} ? ' active'">Cotizaciones</a>
-        <a th:href="@{/planilla}" sec:authorize="hasRole('ADMIN')"
+        <a th:href="@{/clientes}" sec:authorize="hasAnyRole('ADMIN','CAJERO')"
+           th:classappend="${modulo=='clientes'} ? ' active'">Clientes</a>
+        <a th:href="@{/cotizaciones}" sec:authorize="hasAnyRole('ADMIN','CAJERO')"
+           th:classappend="${modulo=='cotizaciones'} ? ' active'">Cotizaciones</a>
+        <a th:href="@{/ventas}" sec:authorize="hasAnyRole('ADMIN','CAJERO','CONTADOR')"
+           th:classappend="${modulo=='ventas'} ? ' active'">Ventas</a>
+        <a th:href="@{/proveedores}" sec:authorize="hasRole('ADMIN')"
+           th:classappend="${modulo=='proveedores'} ? ' active'">Proveedores</a>
+        <a th:href="@{/inventario}" sec:authorize="hasAnyRole('ADMIN','CAJERO','OPERADOR')"
+           th:classappend="${modulo=='inventario'} ? ' active'">Inventario</a>
+        <a th:href="@{/herramientas}" sec:authorize="hasAnyRole('ADMIN','OPERADOR')"
+           th:classappend="${modulo=='herramientas'} ? ' active'">Herramientas</a>
+        <a th:href="@{/logistica}" sec:authorize="hasAnyRole('ADMIN','OPERADOR')"
+           th:classappend="${modulo=='logistica'} ? ' active'">Logística</a>
+        <a th:href="@{/planilla}" sec:authorize="hasAnyRole('ADMIN','CONTADOR')"
            th:classappend="${modulo=='planilla'} ? ' active'">Planilla</a>
+        <a th:href="@{/reportes}" sec:authorize="hasAnyRole('ADMIN','CONTADOR')"
+           th:classappend="${modulo=='reportes'} ? ' active'">Reportes</a>
+        <a th:href="@{/fiscal}" sec:authorize="hasRole('ADMIN')"
+           th:classappend="${modulo=='fiscal'} ? ' active'">Fiscal</a>
         <a th:href="@{/usuarios}" sec:authorize="hasRole('ADMIN')"
            th:classappend="${modulo=='usuarios'} ? ' active'">Usuarios</a>
-        <a th:href="@{/logistica}" th:classappend="${modulo=='logistica'} ? ' active'">Logística</a>
     </nav>
     <div class="session">
         <span class="user" sec:authentication="name">usuario</span>

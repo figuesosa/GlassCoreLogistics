@@ -29,8 +29,8 @@ public class ViajeDAOImpl implements ViajeDAO {
     @Override
     public int insertar(Connection cn, Viaje v) throws Exception {
         String sql = "INSERT INTO viaje (vehiculo_id, chofer_id, ruta, es_redondo, kilometros, "
-                + "factor_rendimiento, precio_combustible, litros_estimados, gasto_combustible) "
-                + "VALUES (?,?,?,?,?,?,?,?,?)";
+                + "factor_rendimiento, precio_combustible, litros_estimados, gasto_combustible, origen, destino) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, v.getVehiculoId());
             ps.setInt(2, v.getChoferId());
@@ -41,6 +41,8 @@ public class ViajeDAOImpl implements ViajeDAO {
             ps.setDouble(7, v.getPrecioCombustible());
             ps.setDouble(8, v.getLitrosEstimados());
             ps.setDouble(9, v.getGastoCombustible());
+            ps.setString(10, v.getOrigen());
+            ps.setString(11, v.getDestino());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -88,6 +90,12 @@ public class ViajeDAOImpl implements ViajeDAO {
         v.setChoferId(rs.getInt("chofer_id"));
         v.setChoferNombre(rs.getString("chofer_nombre"));
         v.setRuta(rs.getString("ruta"));
+        try {
+            v.setOrigen(rs.getString("origen"));
+            v.setDestino(rs.getString("destino"));
+        } catch (Exception ignored) {
+            // columnas nuevas
+        }
         v.setEsRedondo(rs.getBoolean("es_redondo"));
         v.setKilometros(rs.getInt("kilometros"));
         v.setFactorRendimiento(rs.getDouble("factor_rendimiento"));

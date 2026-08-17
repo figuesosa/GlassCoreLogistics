@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Inventario')}"></head>
+<body>
+<header th:replace="~{fragments :: top('inventario')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Inventario de materiales</h1>
+    <p class="lead">La cotización no se bloquea si falta stock; al facturar se descuenta lo disponible.</p>
+    <div class="kpis">
+        <div class="kpi"><span>Vidrio</span><strong th:text="${#numbers.formatDecimal(stockVidrio ?: 0,1,3)} + ' m²'">0</strong></div>
+        <div class="kpi"><span>Aluminio</span><strong th:text="${#numbers.formatDecimal(stockAluminio ?: 0,1,3)} + ' m'">0</strong></div>
+        <div class="kpi"><span>Metal</span><strong th:text="${#numbers.formatDecimal(stockMetal ?: 0,1,3)} + ' m'">0</strong></div>
+    </div>
+    <section class="card">
+        <h2>Bodega</h2>
+        <input class="table-search" data-table="#tabla-inv" placeholder="Buscar material">
+        <div class="table-wrap">
+            <table id="tabla-inv">
+                <thead>
+                <tr><th>Material</th><th>Tipo</th><th>Unidad</th><th>Stock</th><th>Precio Lps</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${materiales}">
+                    <td th:text="${m.nombre}"></td>
+                    <td th:text="${m.tipo}"></td>
+                    <td th:text="${m.unidad}"></td>
+                    <td>
+                        <span th:text="${#numbers.formatDecimal(m.stock,1,3)}"></span>
+                        <span th:if="${m.stockBajo}" class="badge warn">BAJO</span>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(m.precioUnitario,1,2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

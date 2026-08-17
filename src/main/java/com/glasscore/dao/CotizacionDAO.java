@@ -7,4 +7,5 @@ public interface CotizacionDAO {
     int insertar(Cotizacion cotizacion) throws Exception;
     List<Cotizacion> listarTodas() throws Exception;
     Cotizacion buscarPorId(int id) throws Exception;
+    void marcarConvertida(int id, String numeroFactura, String cai) throws Exception;
 }

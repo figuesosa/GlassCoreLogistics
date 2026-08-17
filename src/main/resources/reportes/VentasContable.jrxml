@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="VentasContable"
+              pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <parameter name="FECHA_DESDE" class="java.sql.Timestamp"/>
+    <parameter name="FECHA_HASTA" class="java.sql.Timestamp"/>
+    <parameter name="PERIODO" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[SELECT
+            v.numero_factura,
+            v.cai,
+            v.subtotal,
+            v.isv,
+            v.retencion,
+            v.total,
+            v.fecha,
+            c.cliente,
+            c.tipo_estructura
+        FROM venta v
+        INNER JOIN cotizacion c ON c.id = v.cotizacion_id
+        WHERE v.fecha >= $P{FECHA_DESDE} AND v.fecha < $P{FECHA_HASTA}
+        ORDER BY v.fecha]]>
+    </queryString>
+    <field name="numero_factura" class="java.lang.String"/>
+    <field name="cai" class="java.lang.String"/>
+    <field name="subtotal" class="java.math.BigDecimal"/>
+    <field name="isv" class="java.math.BigDecimal"/>
+    <field name="retencion" class="java.math.BigDecimal"/>
+    <field name="total" class="java.math.BigDecimal"/>
+    <field name="fecha" class="java.sql.Timestamp"/>
+    <field name="cliente" class="java.lang.String"/>
+    <field name="tipo_estructura" class="java.lang.String"/>
+    <variable name="SUM_SUB" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+    </variable>
+    <variable name="SUM_ISV" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{isv}]]></variableExpression>
+    </variable>
+    <variable name="SUM_TOT" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{total}]]></variableExpression>
+    </variable>
+    <title>
+        <band height="70">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="24" forecolor="#0B3D5C"/>
+                <textElement textAlignment="Center"><font size="16" isBold="true"/></textElement>
+                <text><![CDATA[GlassCore - Vista Contable de Ventas]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="30" width="555" height="18"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA["Periodo: " + $P{PERIODO} + "  |  ISV 15%  |  CAI y correlativos SAR"]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="22">
+            <staticText>
+                <reportElement x="0" y="0" width="90" height="20"/><text><![CDATA[Factura]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="90" y="0" width="120" height="20"/><text><![CDATA[Cliente]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="210" y="0" width="70" height="20"/><text><![CDATA[Producto]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="280" y="0" width="70" height="20"/><text><![CDATA[Subtotal]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="350" y="0" width="60" height="20"/><text><![CDATA[ISV]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="410" y="0" width="145" height="20"/><text><![CDATA[CAI]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="90" height="16"/>
+                <textFieldExpression><![CDATA[$F{numero_factura}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="90" y="0" width="120" height="16"/>
+                <textFieldExpression><![CDATA[$F{cliente}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="210" y="0" width="70" height="16"/>
+                <textFieldExpression><![CDATA[$F{tipo_estructura}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="280" y="0" width="70" height="16"/>
+                <textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="350" y="0" width="60" height="16"/>
+                <textFieldExpression><![CDATA[$F{isv}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="410" y="0" width="145" height="16"/>
+                <textFieldExpression><![CDATA[$F{cai}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <summary>
+        <band height="50">
+            <textField pattern="#,##0.00">
+                <reportElement x="0" y="10" width="555" height="18"/>
+                <textFieldExpression><![CDATA["Subtotal Lps " + $V{SUM_SUB} + "  |  ISV Lps " + $V{SUM_ISV} + "  |  Total Lps " + $V{SUM_TOT}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

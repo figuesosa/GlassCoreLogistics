@@ -50,7 +50,8 @@ public class UsuariosController {
             if (user.isEmpty()) {
                 throw new IllegalArgumentException("El usuario es obligatorio.");
             }
-            if (!"ADMIN".equals(rol) && !"OPERADOR".equals(rol)) {
+            if (!"ADMIN".equals(rol) && !"OPERADOR".equals(rol)
+                    && !"CONTADOR".equals(rol) && !"CAJERO".equals(rol)) {
                 throw new IllegalArgumentException("Rol inválido.");
             }
             boolean estaActivo = activo;

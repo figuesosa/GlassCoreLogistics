@@ -10,6 +10,8 @@ public class Viaje {
     private int choferId;
     private String choferNombre;
     private String ruta;
+    private String origen;
+    private String destino;
     private boolean esRedondo;
     private int kilometros;
     private double factorRendimiento;
@@ -69,6 +71,11 @@ public class Viaje {
     public void setRuta(String ruta) {
         this.ruta = ruta;
     }
+
+    public String getOrigen() { return origen; }
+    public void setOrigen(String origen) { this.origen = origen; }
+    public String getDestino() { return destino; }
+    public void setDestino(String destino) { this.destino = destino; }
 
     public boolean isEsRedondo() {
         return esRedondo;

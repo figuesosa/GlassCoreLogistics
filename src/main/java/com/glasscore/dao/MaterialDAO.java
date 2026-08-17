@@ -7,4 +7,5 @@ public interface MaterialDAO {
     List<Material> listarTodos() throws Exception;
     Material buscarPorTipo(String tipo) throws Exception;
     double stockPorTipo(String tipo) throws Exception;
+    void descontarPorTipo(java.sql.Connection cn, String tipo, double cantidad) throws Exception;
 }

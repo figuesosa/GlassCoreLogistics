@@ -1,6 +1,12 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/sw.js').catch(function () {
+    navigator.serviceWorker.register('/sw.js').then(function () {
+      if (location.pathname.indexOf('/logistica') === 0 || location.pathname === '/') {
+        fetch('/api/campo/viajes', { credentials: 'same-origin' }).catch(function () {
+          /* sin permiso o sin red: la caché queda como esté */
+        });
+      }
+    }).catch(function () {
       /* sin SW no se bloquea la app */
     });
   });

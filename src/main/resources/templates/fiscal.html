@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments :: head('Fiscal SAR')}"></head>
+<body>
+<header th:replace="~{fragments :: top('fiscal')}"></header>
+<main class="page">
+    <div th:replace="~{fragments :: flashes}"></div>
+    <h1 class="page-title">Configuración fiscal SAR</h1>
+    <p class="lead">Solo el administrador registra RTN, CAI, fecha límite y rangos autorizados. El correlativo se asigna solo al facturar.</p>
+    <section class="card" th:if="${fiscal}">
+        <h2>Parámetros vigentes</h2>
+        <p>Restan <strong th:text="${fiscal.restantes}">0</strong> comprobantes. Próxima factura:
+            <strong th:text="${fiscal.formatoFactura(fiscal.correlativoActual)}"></strong></p>
+        <form th:action="@{/fiscal/guardar}" method="post" class="form-grid two">
+            <label>RTN empresa <input name="rtnEmpresa" required th:value="${fiscal.rtnEmpresa}"></label>
+            <label>CAI <input name="cai" required th:value="${fiscal.cai}"></label>
+            <label>Fecha límite de emisión <input type="date" name="fechaLimite" required th:value="${fiscal.fechaLimiteEmision}"></label>
+            <label>Días hábiles base de cotización
+                <input type="number" name="diasHabiles" min="2" max="15" required th:value="${diasHabiles}">
+            </label>
+            <label>Número inicial <input type="number" name="rangoInicial" min="1" required th:value="${fiscal.rangoInicial}"></label>
+            <label>Número final <input type="number" name="rangoFinal" min="1" required th:value="${fiscal.rangoFinal}"></label>
+            <label class="span-2">Correlativo actual (siguiente a emitir)
+                <input type="number" name="correlativoActual" min="1" required th:value="${fiscal.correlativoActual}">
+            </label>
+            <div class="form-actions span-2">
+                <button class="btn btn-primary" type="submit">Guardar parámetros</button>
+            </div>
+        </form>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>
